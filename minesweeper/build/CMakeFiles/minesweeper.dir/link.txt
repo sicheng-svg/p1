@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/minesweeper.dir/src/main.cpp.o CMakeFiles/minesweeper.dir/src/database.cpp.o -o minesweeper  -lmysqlclient -lpthread 
