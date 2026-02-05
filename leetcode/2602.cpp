@@ -1,5 +1,7 @@
 #include <vector>
 #include <unordered_map>
+#include <stack>
+#include <functional>
 #include <iostream>
 #include <algorithm>
 
@@ -54,6 +56,50 @@ public:
             }
         }
         return ret;
+    }
+};
+
+class Solution3 {
+public:
+    bool isNumber(const std::string& str) {
+        return !(str == "+" || str == "-" || str == "*" || str == "/");
+    }
+
+    std::unordered_map<std::string, std::function<int(int, int)>> method {
+        {"+", [](int left, int right){ return left + right;}},
+        {"-", [](int left, int right){ return left - right;}},
+        {"*", [](int left, int right){ return left * right;}},
+        {"/", [](int left, int right){ return left / right;}}
+    };
+
+    int evalRPN(std::vector<std::string>& tokens) {
+        // 遍历数组进行压栈，当遇到操作符时，连续弹出两次，根据操作符进行运算，随后重新压入栈中
+        std::stack<int> st;
+        for(auto& e : tokens) {
+            if(method.count(e)) {
+                int right = st.top(); st.pop();
+                int left = st.top(); st.pop();
+                st.push(method[e](left,right));
+            }else {
+                st.push(stoi(e));
+            }
+        }
+        return st.top();
+    }
+};
+
+class Solution3 {
+public:
+    bool visited[128] = {false};
+    bool isUnique(std::string astr) {
+        if(astr.size() > 128) return false;
+        for(char e : astr) {
+            if(visited[e]) {
+                return false;
+            }
+            visited[e] = true;
+        }
+        return true;
     }
 };
 
