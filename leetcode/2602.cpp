@@ -1,5 +1,6 @@
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <stack>
 #include <functional>
 #include <iostream>
@@ -88,7 +89,7 @@ public:
     }
 };
 
-class Solution3 {
+class Solution4 {
 public:
     bool visited[128] = {false};
     bool isUnique(std::string astr) {
@@ -102,6 +103,81 @@ public:
         return true;
     }
 };
+
+class Solution5 {
+public:
+    int missingNumber1(std::vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        int n = nums.size();
+        int i = 0;
+        for(i=0; i<n; ++i) {
+            if(nums[i] != i) return i;
+        }
+        return i;
+    }
+
+    int missingNumber2(std::vector<int>& nums) {
+        std::unordered_set<int> hash;
+        int n = nums.size();
+        for(int v : nums) hash.emplace(v);
+        for(int i=0; i<=n; ++i) {
+            if(!hash.count(i)) return i;
+        }
+        return -1;
+    }
+
+        int missingNumber(std::vector<int>& nums) {
+            int n = nums.size();
+            int ret = 0;
+            for(int i=0; i<=n; i++) ret ^= i;
+            for(int v : nums) ret ^= v;
+            return ret;
+    }
+};
+
+class MinStack6 {
+public:
+    MinStack6() {
+    }
+    
+    void push(int val) {
+        if(_min.empty() || val <= _min.top()) {
+            _st.push(val);
+            _min.push(val);
+        }else {
+            _st.push(val);
+        }
+    }
+    
+    void pop() {
+        if(_st.top() == _min.top()) {
+            _st.pop();
+            _min.pop();
+        }else{
+            _st.pop();
+        }
+    }
+    
+    int top() {
+        return _st.top();
+    }
+    
+    int getMin() {
+        return _min.top();
+    }
+private:
+    std::stack<int> _st;
+    std::stack<int> _min;
+};
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack* obj = new MinStack();
+ * obj->push(val);
+ * obj->pop();
+ * int param_3 = obj->top();
+ * int param_4 = obj->getMin();
+ */
 
 int main()
 {
