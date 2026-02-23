@@ -33,6 +33,9 @@ message People{
         string qq = 5;
         string wechat = 6;
     }
+
+    // map类型，key不能是float 和 bite，value可以是任意类型
+    map<string, string> remark = 7;
 }
 
 // 通讯录

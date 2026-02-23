@@ -71,6 +71,22 @@ void addNewContact(contacts::People* people)
         std::cout << " 不新增其他联系方式" << std::endl;
     }
 
+    // 为联系人添加备注
+    for(int i=0;; ++i) {
+        std::cout << "remark " << i+1 << ": " << std::endl;
+        std::cout << "key: " ;
+        std::string key;
+        getline(std::cin, key);
+        if(key.empty()) break;
+
+        std::cout << "value: ";
+        std::string value;
+        getline(std::cin, value);
+        if(value.empty())break;
+
+        people->mutable_remark()->insert({key, value});
+    }
+
     std::cout << "add new contact success!" << std::endl;
 }
 

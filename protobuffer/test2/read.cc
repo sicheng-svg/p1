@@ -57,6 +57,15 @@ int main() {
             default:
                 std::cout << "have no other contact" << std::endl;
         }
+
+        // 打印备注
+        if(people.remark_size()) {
+            std::cout << "remark: " << std::endl;
+            for(auto &[key, value]: people.remark()){
+                std::cout << "    key: " << key << std::endl; 
+                std::cout << "    value: " << value << std::endl; 
+            }
+        }
     }
 
 

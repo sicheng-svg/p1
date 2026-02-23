@@ -29,6 +29,9 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map_entry.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/any.pb.h>
@@ -56,6 +59,9 @@ extern ContactsDefaultTypeInternal _Contacts_default_instance_;
 class People;
 struct PeopleDefaultTypeInternal;
 extern PeopleDefaultTypeInternal _People_default_instance_;
+class People_RemarkEntry_DoNotUse;
+struct People_RemarkEntry_DoNotUseDefaultTypeInternal;
+extern People_RemarkEntry_DoNotUseDefaultTypeInternal _People_RemarkEntry_DoNotUse_default_instance_;
 class Phone;
 struct PhoneDefaultTypeInternal;
 extern PhoneDefaultTypeInternal _Phone_default_instance_;
@@ -64,6 +70,7 @@ PROTOBUF_NAMESPACE_OPEN
 template<> ::contacts::Address* Arena::CreateMaybeMessage<::contacts::Address>(Arena*);
 template<> ::contacts::Contacts* Arena::CreateMaybeMessage<::contacts::Contacts>(Arena*);
 template<> ::contacts::People* Arena::CreateMaybeMessage<::contacts::People>(Arena*);
+template<> ::contacts::People_RemarkEntry_DoNotUse* Arena::CreateMaybeMessage<::contacts::People_RemarkEntry_DoNotUse>(Arena*);
 template<> ::contacts::Phone* Arena::CreateMaybeMessage<::contacts::Phone>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace contacts {
@@ -429,6 +436,34 @@ class Phone final :
 };
 // -------------------------------------------------------------------
 
+class People_RemarkEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<People_RemarkEntry_DoNotUse, 
+    std::string, std::string,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING> {
+public:
+  typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<People_RemarkEntry_DoNotUse, 
+    std::string, std::string,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING> SuperType;
+  People_RemarkEntry_DoNotUse();
+  explicit PROTOBUF_CONSTEXPR People_RemarkEntry_DoNotUse(
+      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit People_RemarkEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  void MergeFrom(const People_RemarkEntry_DoNotUse& other);
+  static const People_RemarkEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const People_RemarkEntry_DoNotUse*>(&_People_RemarkEntry_DoNotUse_default_instance_); }
+  static bool ValidateKey(std::string* s) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "contacts.People.RemarkEntry.key");
+ }
+  static bool ValidateValue(std::string* s) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "contacts.People.RemarkEntry.value");
+ }
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  friend struct ::TableStruct_contacts_2eproto;
+};
+
+// -------------------------------------------------------------------
+
 class People final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:contacts.People) */ {
  public:
@@ -483,7 +518,7 @@ class People final :
                &_People_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(People& a, People& b) {
     a.Swap(&b);
@@ -544,6 +579,8 @@ class People final :
   protected:
   explicit People(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                        bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
   public:
 
   static const ClassData _class_data_;
@@ -553,10 +590,12 @@ class People final :
 
   // nested types ----------------------------------------------------
 
+
   // accessors -------------------------------------------------------
 
   enum : int {
     kPhoneFieldNumber = 3,
+    kRemarkFieldNumber = 7,
     kNameFieldNumber = 1,
     kDateFieldNumber = 4,
     kAgeFieldNumber = 2,
@@ -580,6 +619,23 @@ class People final :
   ::contacts::Phone* add_phone();
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::contacts::Phone >&
       phone() const;
+
+  // map<string, string> remark = 7;
+  int remark_size() const;
+  private:
+  int _internal_remark_size() const;
+  public:
+  void clear_remark();
+  private:
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >&
+      _internal_remark() const;
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >*
+      _internal_mutable_remark();
+  public:
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >&
+      remark() const;
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >*
+      mutable_remark();
 
   // string name = 1;
   void clear_name();
@@ -674,6 +730,11 @@ class People final :
   typedef void DestructorSkippable_;
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::contacts::Phone > phone_;
+    ::PROTOBUF_NAMESPACE_ID::internal::MapField<
+        People_RemarkEntry_DoNotUse,
+        std::string, std::string,
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING> remark_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
     ::PROTOBUF_NAMESPACE_ID::Any* date_;
     int32_t age_;
@@ -740,7 +801,7 @@ class Contacts final :
                &_Contacts_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(Contacts& a, Contacts& b) {
     a.Swap(&b);
@@ -1031,6 +1092,8 @@ inline void Phone::set_type(::contacts::PhoneType value) {
   _internal_set_type(value);
   // @@protoc_insertion_point(field_set:contacts.Phone.type)
 }
+
+// -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
 
@@ -1385,6 +1448,35 @@ inline void People::set_allocated_wechat(std::string* wechat) {
   // @@protoc_insertion_point(field_set_allocated:contacts.People.wechat)
 }
 
+// map<string, string> remark = 7;
+inline int People::_internal_remark_size() const {
+  return _impl_.remark_.size();
+}
+inline int People::remark_size() const {
+  return _internal_remark_size();
+}
+inline void People::clear_remark() {
+  _impl_.remark_.Clear();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >&
+People::_internal_remark() const {
+  return _impl_.remark_.GetMap();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >&
+People::remark() const {
+  // @@protoc_insertion_point(field_map:contacts.People.remark)
+  return _internal_remark();
+}
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >*
+People::_internal_mutable_remark() {
+  return _impl_.remark_.MutableMap();
+}
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >*
+People::mutable_remark() {
+  // @@protoc_insertion_point(field_mutable_map:contacts.People.remark)
+  return _internal_mutable_remark();
+}
+
 inline bool People::has_other_contact() const {
   return other_contact_case() != OTHER_CONTACT_NOT_SET;
 }
@@ -1441,6 +1533,8 @@ Contacts::people() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
