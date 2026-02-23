@@ -45,6 +45,18 @@ int main() {
                 std::cout << "work: " << address.work() << std::endl;
             }
         }
+
+        // 打印其他联系方式
+        switch(people.other_contact_case()){
+            case contacts::People::OtherContactCase::kQq:
+                std::cout << "qq: " << people.qq() << std::endl;
+                break;
+            case contacts::People::OtherContactCase::kWechat:
+                std::cout << "wechat: " << people.wechat() << std::endl;
+                break;
+            default:
+                std::cout << "have no other contact" << std::endl;
+        }
     }
 
 

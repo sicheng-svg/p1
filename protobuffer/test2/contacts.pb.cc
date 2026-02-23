@@ -55,7 +55,9 @@ PROTOBUF_CONSTEXPR People::People(
   , /*decltype(_impl_.name_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.date_)*/nullptr
   , /*decltype(_impl_.age_)*/0
-  , /*decltype(_impl_._cached_size_)*/{}} {}
+  , /*decltype(_impl_.other_contact_)*/{}
+  , /*decltype(_impl_._cached_size_)*/{}
+  , /*decltype(_impl_._oneof_case_)*/{}} {}
 struct PeopleDefaultTypeInternal {
   PROTOBUF_CONSTEXPR PeopleDefaultTypeInternal()
       : _instance(::_pbi::ConstantInitialized{}) {}
@@ -103,13 +105,16 @@ const uint32_t TableStruct_contacts_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::contacts::People, _internal_metadata_),
   ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
+  PROTOBUF_FIELD_OFFSET(::contacts::People, _impl_._oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::contacts::People, _impl_.name_),
   PROTOBUF_FIELD_OFFSET(::contacts::People, _impl_.age_),
   PROTOBUF_FIELD_OFFSET(::contacts::People, _impl_.phone_),
   PROTOBUF_FIELD_OFFSET(::contacts::People, _impl_.date_),
+  ::_pbi::kInvalidFieldOffsetTag,
+  ::_pbi::kInvalidFieldOffsetTag,
+  PROTOBUF_FIELD_OFFSET(::contacts::People, _impl_.other_contact_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::contacts::Contacts, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -122,7 +127,7 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 0, -1, -1, sizeof(::contacts::Address)},
   { 8, -1, -1, sizeof(::contacts::Phone)},
   { 16, -1, -1, sizeof(::contacts::People)},
-  { 26, -1, -1, sizeof(::contacts::Contacts)},
+  { 29, -1, -1, sizeof(::contacts::Contacts)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -136,20 +141,21 @@ const char descriptor_table_protodef_contacts_2eproto[] PROTOBUF_SECTION_VARIABL
   "\n\016contacts.proto\022\010contacts\032\031google/proto"
   "buf/any.proto\"%\n\007Address\022\014\n\004home\030\001 \001(\t\022\014"
   "\n\004work\030\002 \001(\t\":\n\005Phone\022\016\n\006number\030\001 \001(\t\022!\n"
-  "\004type\030\002 \001(\0162\023.contacts.PhoneType\"g\n\006Peop"
-  "le\022\014\n\004name\030\001 \001(\t\022\013\n\003age\030\002 \001(\005\022\036\n\005phone\030\003"
-  " \003(\0132\017.contacts.Phone\022\"\n\004date\030\004 \001(\0132\024.go"
-  "ogle.protobuf.Any\",\n\010Contacts\022 \n\006people\030"
-  "\001 \003(\0132\020.contacts.People*8\n\tPhoneType\022\013\n\007"
-  "UNKNOWN\020\000\022\020\n\014MOBILE_PHONE\020\001\022\014\n\010LANDLINE\020"
-  "\002b\006proto3"
+  "\004type\030\002 \001(\0162\023.contacts.PhoneType\"\230\001\n\006Peo"
+  "ple\022\014\n\004name\030\001 \001(\t\022\013\n\003age\030\002 \001(\005\022\036\n\005phone\030"
+  "\003 \003(\0132\017.contacts.Phone\022\"\n\004date\030\004 \001(\0132\024.g"
+  "oogle.protobuf.Any\022\014\n\002qq\030\005 \001(\tH\000\022\020\n\006wech"
+  "at\030\006 \001(\tH\000B\017\n\rother_contact\",\n\010Contacts\022"
+  " \n\006people\030\001 \003(\0132\020.contacts.People*8\n\tPho"
+  "neType\022\013\n\007UNKNOWN\020\000\022\020\n\014MOBILE_PHONE\020\001\022\014\n"
+  "\010LANDLINE\020\002b\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_contacts_2eproto_deps[1] = {
   &::descriptor_table_google_2fprotobuf_2fany_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_contacts_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_contacts_2eproto = {
-    false, false, 369, descriptor_table_protodef_contacts_2eproto,
+    false, false, 419, descriptor_table_protodef_contacts_2eproto,
     "contacts.proto",
     &descriptor_table_contacts_2eproto_once, descriptor_table_contacts_2eproto_deps, 1, 4,
     schemas, file_default_instances, TableStruct_contacts_2eproto::offsets,
@@ -696,7 +702,9 @@ People::People(const People& from)
     , decltype(_impl_.name_){}
     , decltype(_impl_.date_){nullptr}
     , decltype(_impl_.age_){}
-    , /*decltype(_impl_._cached_size_)*/{}};
+    , decltype(_impl_.other_contact_){}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , /*decltype(_impl_._oneof_case_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   _impl_.name_.InitDefault();
@@ -711,6 +719,20 @@ People::People(const People& from)
     _this->_impl_.date_ = new ::PROTOBUF_NAMESPACE_ID::Any(*from._impl_.date_);
   }
   _this->_impl_.age_ = from._impl_.age_;
+  clear_has_other_contact();
+  switch (from.other_contact_case()) {
+    case kQq: {
+      _this->_internal_set_qq(from._internal_qq());
+      break;
+    }
+    case kWechat: {
+      _this->_internal_set_wechat(from._internal_wechat());
+      break;
+    }
+    case OTHER_CONTACT_NOT_SET: {
+      break;
+    }
+  }
   // @@protoc_insertion_point(copy_constructor:contacts.People)
 }
 
@@ -723,12 +745,15 @@ inline void People::SharedCtor(
     , decltype(_impl_.name_){}
     , decltype(_impl_.date_){nullptr}
     , decltype(_impl_.age_){0}
+    , decltype(_impl_.other_contact_){}
     , /*decltype(_impl_._cached_size_)*/{}
+    , /*decltype(_impl_._oneof_case_)*/{}
   };
   _impl_.name_.InitDefault();
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
     _impl_.name_.Set("", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  clear_has_other_contact();
 }
 
 People::~People() {
@@ -745,11 +770,33 @@ inline void People::SharedDtor() {
   _impl_.phone_.~RepeatedPtrField();
   _impl_.name_.Destroy();
   if (this != internal_default_instance()) delete _impl_.date_;
+  if (has_other_contact()) {
+    clear_other_contact();
+  }
 }
 
 void People::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
+
+void People::clear_other_contact() {
+// @@protoc_insertion_point(one_of_clear_start:contacts.People)
+  switch (other_contact_case()) {
+    case kQq: {
+      _impl_.other_contact_.qq_.Destroy();
+      break;
+    }
+    case kWechat: {
+      _impl_.other_contact_.wechat_.Destroy();
+      break;
+    }
+    case OTHER_CONTACT_NOT_SET: {
+      break;
+    }
+  }
+  _impl_._oneof_case_[0] = OTHER_CONTACT_NOT_SET;
+}
+
 
 void People::Clear() {
 // @@protoc_insertion_point(message_clear_start:contacts.People)
@@ -764,6 +811,7 @@ void People::Clear() {
   }
   _impl_.date_ = nullptr;
   _impl_.age_ = 0;
+  clear_other_contact();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -809,6 +857,26 @@ const char* People::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           ptr = ctx->ParseMessage(_internal_mutable_date(), ptr);
           CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string qq = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
+          auto str = _internal_mutable_qq();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "contacts.People.qq"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string wechat = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
+          auto str = _internal_mutable_wechat();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "contacts.People.wechat"));
         } else
           goto handle_unusual;
         continue;
@@ -872,6 +940,26 @@ uint8_t* People::_InternalSerialize(
         _Internal::date(this).GetCachedSize(), target, stream);
   }
 
+  // string qq = 5;
+  if (_internal_has_qq()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_qq().data(), static_cast<int>(this->_internal_qq().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "contacts.People.qq");
+    target = stream->WriteStringMaybeAliased(
+        5, this->_internal_qq(), target);
+  }
+
+  // string wechat = 6;
+  if (_internal_has_wechat()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_wechat().data(), static_cast<int>(this->_internal_wechat().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "contacts.People.wechat");
+    target = stream->WriteStringMaybeAliased(
+        6, this->_internal_wechat(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -914,6 +1002,25 @@ size_t People::ByteSizeLong() const {
     total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_age());
   }
 
+  switch (other_contact_case()) {
+    // string qq = 5;
+    case kQq: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_qq());
+      break;
+    }
+    // string wechat = 6;
+    case kWechat: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_wechat());
+      break;
+    }
+    case OTHER_CONTACT_NOT_SET: {
+      break;
+    }
+  }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -942,6 +1049,19 @@ void People::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBU
   }
   if (from._internal_age() != 0) {
     _this->_internal_set_age(from._internal_age());
+  }
+  switch (from.other_contact_case()) {
+    case kQq: {
+      _this->_internal_set_qq(from._internal_qq());
+      break;
+    }
+    case kWechat: {
+      _this->_internal_set_wechat(from._internal_wechat());
+      break;
+    }
+    case OTHER_CONTACT_NOT_SET: {
+      break;
+    }
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -973,6 +1093,8 @@ void People::InternalSwap(People* other) {
       - PROTOBUF_FIELD_OFFSET(People, _impl_.date_)>(
           reinterpret_cast<char*>(&_impl_.date_),
           reinterpret_cast<char*>(&other->_impl_.date_));
+  swap(_impl_.other_contact_, other->_impl_.other_contact_);
+  swap(_impl_._oneof_case_[0], other->_impl_._oneof_case_[0]);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata People::GetMetadata() const {

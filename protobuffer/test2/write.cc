@@ -52,6 +52,25 @@ void addNewContact(contacts::People* people)
     address.set_work(work);
     people->mutable_date()->PackFrom(address);
 
+    // 为联系人增加其他联系方式
+    std::cout << "add other contact: 1.qq 2.wechat: ";
+    int other = 0;
+    std::cin >> other;
+    std::cin.ignore(256, '\n');
+
+    std::string other_contact;
+    if(other == 1) {
+        std::cout << "enter qq: ";
+        getline(std::cin, other_contact);
+        people->set_qq(other_contact);
+    }else if(other == 2) {
+        std::cout << "enter wechat: ";
+        getline(std::cin, other_contact);
+        people->set_wechat(other_contact);
+    }else{
+        std::cout << " 不新增其他联系方式" << std::endl;
+    }
+
     std::cout << "add new contact success!" << std::endl;
 }
 

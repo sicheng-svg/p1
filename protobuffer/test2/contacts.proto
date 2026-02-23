@@ -26,6 +26,13 @@ message People{
     int32 age = 2;
     repeated Phone phone = 3;
     google.protobuf.Any date = 4;
+
+    // 使用oneof时，内部的字段的字段编号必须接着之前的字段编号进行
+    // 类似于C++的union联合体
+    oneof other_contact{
+        string qq = 5;
+        string wechat = 6;
+    }
 }
 
 // 通讯录
