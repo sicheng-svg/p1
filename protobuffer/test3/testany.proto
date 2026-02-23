@@ -1,0 +1,9 @@
+syntax = "proto3";
+package testany;
+import "google/protobuf/any.proto";
+
+message people{
+    string name = 1;
+    int32 age = 2;
+    google.protobuf.Any info = 3;
+}

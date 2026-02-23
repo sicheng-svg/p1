@@ -32,6 +32,19 @@ int main() {
             auto phone = people.phone(j); // 指定联系人的电话信息
             std::cout << "phone " << j + 1 << ": " << phone.number() << ": " << contacts::PhoneType_Name(phone.type()) << std::endl;
         }
+
+        // 打印地址
+        contacts::Address address;
+        if(people.has_date() && people.date().Is<contacts::Address>()) {
+            // 确保any字段存在，并且是contacts::Address类型
+            people.date().UnpackTo(&address);
+            if(!(address.home().empty())) {
+                std::cout << "home: " << address.home() << std::endl;
+            }
+            if(!(address.work().empty())) {
+                std::cout << "work: " << address.work() << std::endl;
+            }
+        }
     }
 
 

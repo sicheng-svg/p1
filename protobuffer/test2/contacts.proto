@@ -1,5 +1,11 @@
 syntax = "proto3";
 package contacts;
+import "google/protobuf/any.proto";
+
+message Address{
+    string home = 1;
+    string work = 2;
+}
 
 // 增加电话类型
 enum PhoneType{
@@ -19,6 +25,7 @@ message People{
     string name = 1;
     int32 age = 2;
     repeated Phone phone = 3;
+    google.protobuf.Any date = 4;
 }
 
 // 通讯录

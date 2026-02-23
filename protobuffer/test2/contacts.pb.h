@@ -31,6 +31,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
+#include <google/protobuf/any.pb.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_contacts_2eproto
@@ -46,6 +47,9 @@ struct TableStruct_contacts_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_contacts_2eproto;
 namespace contacts {
+class Address;
+struct AddressDefaultTypeInternal;
+extern AddressDefaultTypeInternal _Address_default_instance_;
 class Contacts;
 struct ContactsDefaultTypeInternal;
 extern ContactsDefaultTypeInternal _Contacts_default_instance_;
@@ -57,6 +61,7 @@ struct PhoneDefaultTypeInternal;
 extern PhoneDefaultTypeInternal _Phone_default_instance_;
 }  // namespace contacts
 PROTOBUF_NAMESPACE_OPEN
+template<> ::contacts::Address* Arena::CreateMaybeMessage<::contacts::Address>(Arena*);
 template<> ::contacts::Contacts* Arena::CreateMaybeMessage<::contacts::Contacts>(Arena*);
 template<> ::contacts::People* Arena::CreateMaybeMessage<::contacts::People>(Arena*);
 template<> ::contacts::Phone* Arena::CreateMaybeMessage<::contacts::Phone>(Arena*);
@@ -90,6 +95,175 @@ inline bool PhoneType_Parse(
     PhoneType_descriptor(), name, value);
 }
 // ===================================================================
+
+class Address final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:contacts.Address) */ {
+ public:
+  inline Address() : Address(nullptr) {}
+  ~Address() override;
+  explicit PROTOBUF_CONSTEXPR Address(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  Address(const Address& from);
+  Address(Address&& from) noexcept
+    : Address() {
+    *this = ::std::move(from);
+  }
+
+  inline Address& operator=(const Address& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Address& operator=(Address&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const Address& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const Address* internal_default_instance() {
+    return reinterpret_cast<const Address*>(
+               &_Address_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  friend void swap(Address& a, Address& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Address* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Address* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  Address* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<Address>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const Address& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const Address& from) {
+    Address::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Address* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "contacts.Address";
+  }
+  protected:
+  explicit Address(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kHomeFieldNumber = 1,
+    kWorkFieldNumber = 2,
+  };
+  // string home = 1;
+  void clear_home();
+  const std::string& home() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_home(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_home();
+  PROTOBUF_NODISCARD std::string* release_home();
+  void set_allocated_home(std::string* home);
+  private:
+  const std::string& _internal_home() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_home(const std::string& value);
+  std::string* _internal_mutable_home();
+  public:
+
+  // string work = 2;
+  void clear_work();
+  const std::string& work() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_work(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_work();
+  PROTOBUF_NODISCARD std::string* release_work();
+  void set_allocated_work(std::string* work);
+  private:
+  const std::string& _internal_work() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_work(const std::string& value);
+  std::string* _internal_mutable_work();
+  public:
+
+  // @@protoc_insertion_point(class_scope:contacts.Address)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr home_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr work_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_contacts_2eproto;
+};
+// -------------------------------------------------------------------
 
 class Phone final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:contacts.Phone) */ {
@@ -139,7 +313,7 @@ class Phone final :
                &_Phone_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    1;
 
   friend void swap(Phone& a, Phone& b) {
     a.Swap(&b);
@@ -303,7 +477,7 @@ class People final :
                &_People_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   friend void swap(People& a, People& b) {
     a.Swap(&b);
@@ -378,6 +552,7 @@ class People final :
   enum : int {
     kPhoneFieldNumber = 3,
     kNameFieldNumber = 1,
+    kDateFieldNumber = 4,
     kAgeFieldNumber = 2,
   };
   // repeated .contacts.Phone phone = 3;
@@ -412,6 +587,24 @@ class People final :
   std::string* _internal_mutable_name();
   public:
 
+  // .google.protobuf.Any date = 4;
+  bool has_date() const;
+  private:
+  bool _internal_has_date() const;
+  public:
+  void clear_date();
+  const ::PROTOBUF_NAMESPACE_ID::Any& date() const;
+  PROTOBUF_NODISCARD ::PROTOBUF_NAMESPACE_ID::Any* release_date();
+  ::PROTOBUF_NAMESPACE_ID::Any* mutable_date();
+  void set_allocated_date(::PROTOBUF_NAMESPACE_ID::Any* date);
+  private:
+  const ::PROTOBUF_NAMESPACE_ID::Any& _internal_date() const;
+  ::PROTOBUF_NAMESPACE_ID::Any* _internal_mutable_date();
+  public:
+  void unsafe_arena_set_allocated_date(
+      ::PROTOBUF_NAMESPACE_ID::Any* date);
+  ::PROTOBUF_NAMESPACE_ID::Any* unsafe_arena_release_date();
+
   // int32 age = 2;
   void clear_age();
   int32_t age() const;
@@ -431,6 +624,7 @@ class People final :
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::contacts::Phone > phone_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
+    ::PROTOBUF_NAMESPACE_ID::Any* date_;
     int32_t age_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
@@ -487,7 +681,7 @@ class Contacts final :
                &_Contacts_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(Contacts& a, Contacts& b) {
     a.Swap(&b);
@@ -603,6 +797,110 @@ class Contacts final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// Address
+
+// string home = 1;
+inline void Address::clear_home() {
+  _impl_.home_.ClearToEmpty();
+}
+inline const std::string& Address::home() const {
+  // @@protoc_insertion_point(field_get:contacts.Address.home)
+  return _internal_home();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Address::set_home(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.home_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:contacts.Address.home)
+}
+inline std::string* Address::mutable_home() {
+  std::string* _s = _internal_mutable_home();
+  // @@protoc_insertion_point(field_mutable:contacts.Address.home)
+  return _s;
+}
+inline const std::string& Address::_internal_home() const {
+  return _impl_.home_.Get();
+}
+inline void Address::_internal_set_home(const std::string& value) {
+  
+  _impl_.home_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Address::_internal_mutable_home() {
+  
+  return _impl_.home_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Address::release_home() {
+  // @@protoc_insertion_point(field_release:contacts.Address.home)
+  return _impl_.home_.Release();
+}
+inline void Address::set_allocated_home(std::string* home) {
+  if (home != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.home_.SetAllocated(home, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.home_.IsDefault()) {
+    _impl_.home_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:contacts.Address.home)
+}
+
+// string work = 2;
+inline void Address::clear_work() {
+  _impl_.work_.ClearToEmpty();
+}
+inline const std::string& Address::work() const {
+  // @@protoc_insertion_point(field_get:contacts.Address.work)
+  return _internal_work();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Address::set_work(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.work_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:contacts.Address.work)
+}
+inline std::string* Address::mutable_work() {
+  std::string* _s = _internal_mutable_work();
+  // @@protoc_insertion_point(field_mutable:contacts.Address.work)
+  return _s;
+}
+inline const std::string& Address::_internal_work() const {
+  return _impl_.work_.Get();
+}
+inline void Address::_internal_set_work(const std::string& value) {
+  
+  _impl_.work_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Address::_internal_mutable_work() {
+  
+  return _impl_.work_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Address::release_work() {
+  // @@protoc_insertion_point(field_release:contacts.Address.work)
+  return _impl_.work_.Release();
+}
+inline void Address::set_allocated_work(std::string* work) {
+  if (work != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.work_.SetAllocated(work, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.work_.IsDefault()) {
+    _impl_.work_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:contacts.Address.work)
+}
+
+// -------------------------------------------------------------------
+
 // Phone
 
 // string number = 1;
@@ -789,6 +1087,91 @@ People::phone() const {
   return _impl_.phone_;
 }
 
+// .google.protobuf.Any date = 4;
+inline bool People::_internal_has_date() const {
+  return this != internal_default_instance() && _impl_.date_ != nullptr;
+}
+inline bool People::has_date() const {
+  return _internal_has_date();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::Any& People::_internal_date() const {
+  const ::PROTOBUF_NAMESPACE_ID::Any* p = _impl_.date_;
+  return p != nullptr ? *p : reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Any&>(
+      ::PROTOBUF_NAMESPACE_ID::_Any_default_instance_);
+}
+inline const ::PROTOBUF_NAMESPACE_ID::Any& People::date() const {
+  // @@protoc_insertion_point(field_get:contacts.People.date)
+  return _internal_date();
+}
+inline void People::unsafe_arena_set_allocated_date(
+    ::PROTOBUF_NAMESPACE_ID::Any* date) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.date_);
+  }
+  _impl_.date_ = date;
+  if (date) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:contacts.People.date)
+}
+inline ::PROTOBUF_NAMESPACE_ID::Any* People::release_date() {
+  
+  ::PROTOBUF_NAMESPACE_ID::Any* temp = _impl_.date_;
+  _impl_.date_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::PROTOBUF_NAMESPACE_ID::Any* People::unsafe_arena_release_date() {
+  // @@protoc_insertion_point(field_release:contacts.People.date)
+  
+  ::PROTOBUF_NAMESPACE_ID::Any* temp = _impl_.date_;
+  _impl_.date_ = nullptr;
+  return temp;
+}
+inline ::PROTOBUF_NAMESPACE_ID::Any* People::_internal_mutable_date() {
+  
+  if (_impl_.date_ == nullptr) {
+    auto* p = CreateMaybeMessage<::PROTOBUF_NAMESPACE_ID::Any>(GetArenaForAllocation());
+    _impl_.date_ = p;
+  }
+  return _impl_.date_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::Any* People::mutable_date() {
+  ::PROTOBUF_NAMESPACE_ID::Any* _msg = _internal_mutable_date();
+  // @@protoc_insertion_point(field_mutable:contacts.People.date)
+  return _msg;
+}
+inline void People::set_allocated_date(::PROTOBUF_NAMESPACE_ID::Any* date) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.date_);
+  }
+  if (date) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(date));
+    if (message_arena != submessage_arena) {
+      date = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, date, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.date_ = date;
+  // @@protoc_insertion_point(field_set_allocated:contacts.People.date)
+}
+
 // -------------------------------------------------------------------
 
 // Contacts
@@ -836,6 +1219,8 @@ Contacts::people() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

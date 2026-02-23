@@ -37,6 +37,21 @@ void addNewContact(contacts::People* people)
             phone->set_type(contacts::PhoneType::UNKNOWN);
         }
     }
+
+    // 先将地址存在address消息中，随后转换为any，存入到people中
+    contacts::Address address;
+    std::cout << "enter contact address:" << std::endl;
+    std::cout << "home address: ";
+    std::string home;
+    getline(std::cin, home);
+    address.set_home(home);
+
+    std::cout << "work address: ";
+    std::string work;
+    getline(std::cin, work);
+    address.set_work(work);
+    people->mutable_date()->PackFrom(address);
+
     std::cout << "add new contact success!" << std::endl;
 }
 
