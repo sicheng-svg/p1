@@ -1,0 +1,12 @@
+syntax = "proto3";
+package testenum2;
+import "testenum.proto";
+
+// 如果在一个proto文件中，引入的另一个proto文件中包含有相同的字段，则也会报错
+// 除非两者定义了不同的package
+
+// testenum2.proto:7:5: "MAN" is already defined in file "testenum.proto".
+// testenum2.proto:7:5: Note that enum values use C++ scoping rules, meaning that enum values are siblings of their type, not children of it.  Therefore, "MAN" must be unique within the global scope, not just within "ss".
+enum ss{
+    MAN  = 0;
+}

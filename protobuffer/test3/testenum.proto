@@ -1,0 +1,26 @@
+syntax = "proto3";
+package testenum;
+
+// 在protobuf中，同级中的所有枚举类型中，不允许出现相同的字段，如下所示
+// testenum.proto:10:5: "WOMEAN" is already defined.
+// testenum.proto:10:5: Note that enum values use C++ scoping rules, meaning that enum values are siblings of their type, not children of it.  Therefore, "WOMEAN" must be unique within the global scope, not just within "test".
+enum sex{
+    MAN = 0;
+    WOMEAN = 1;
+}
+
+//enum test{
+//    WOMEAN = 0;
+//}
+
+// 嵌套写法不与上面的冲突，因为其被限制在pepole中。但是在同一个message中，属于同级，不能出现相同的字段
+message people{
+    string name = 1;
+    int32 age = 2;
+    enum sexy{
+        MAN = 0;
+        WOMEAN = 1;
+    }
+}
+
+// 在proto文件中的，对于enum来说，如果没有指定枚举类型，则默认使用0号

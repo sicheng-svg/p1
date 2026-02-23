@@ -1,0 +1,27 @@
+syntax = "proto3";
+package contacts;
+
+// 增加电话类型
+enum PhoneType{
+    UNKNOWN = 0;
+    MOBILE_PHONE = 1;
+    LANDLINE = 2;
+}
+
+// 电话信息
+message Phone{
+    string number = 1;
+    PhoneType type = 2;
+}
+
+// 联系人信息
+message People{
+    string name = 1;
+    int32 age = 2;
+    repeated Phone phone = 3;
+}
+
+// 通讯录
+message Contacts{
+    repeated People people = 1;
+}

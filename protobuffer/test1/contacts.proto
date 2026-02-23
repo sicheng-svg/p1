@@ -1,0 +1,9 @@
+// 首行定义proto语法
+syntax = "proto3";
+package contacts; // 定义命名空间
+
+// 定义协议字段
+message peopleInof{
+    string name = 1;
+    int32 age = 2;
+}
