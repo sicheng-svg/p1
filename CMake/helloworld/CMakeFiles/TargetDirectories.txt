@@ -1,0 +1,3 @@
+/home/xsc/workspace/code/cpp/p1/CMake/helloworld/CMakeFiles/main.dir
+/home/xsc/workspace/code/cpp/p1/CMake/helloworld/CMakeFiles/edit_cache.dir
+/home/xsc/workspace/code/cpp/p1/CMake/helloworld/CMakeFiles/rebuild_cache.dir
