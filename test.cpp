@@ -3,6 +3,7 @@
 int main()
 {
     // std::cout << "hello github" << std::endl;
+	std::cout <<  "holiday ending" << std::endl;
     std::cout << "holiday end\n";
     std::cout << "test user commands" << std::endl;
     std::cout << "hello staruday\n";
