@@ -1,6 +1,8 @@
+#include <string>
 #include <vector>
 #include <queue>
 #include <deque>
+#include <algorithm>
 
 class Solution {
 public:
@@ -191,5 +193,168 @@ public:
             is_left_to_right = !is_left_to_right;
         }
         return ret;
+    }
+};
+
+
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
+class Solution7 {
+public:
+    void reorderList(ListNode* head) {
+        if(head->next == nullptr || head->next->next == nullptr) return;
+
+        // 1.借助快慢指针，找到链表的中间节点
+        // 奇数节点，mid = n/2；偶数节点，mid = n/2+1；
+        ListNode* mid = getMiddleNode(head);
+
+        // 2.逆置后半部分
+        // 使用头插法，进行逆置
+        ListNode* l1 = head;
+        ListNode* l2 = mid->next;
+        mid->next = nullptr; // 分割两个链表
+        l2 = reverseList(l2);
+        
+        // 3.合并两个链表
+        head = mergeList(l1, l2);
+    }
+private:
+    ListNode* getMiddleNode(ListNode* head) {
+        ListNode* slow = head, *fast = head;
+        while(fast != nullptr && fast->next != nullptr){
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        return slow;
+    }
+
+    ListNode* reverseList(ListNode* head){
+        ListNode* newHead = nullptr;
+        ListNode* cur = head;
+        while(cur) {
+            ListNode* next = cur->next;
+            cur->next = newHead;
+            newHead = cur;
+            cur = next;
+        }
+        return newHead;
+    }
+
+    ListNode* mergeList(ListNode* l1, ListNode* l2){
+        ListNode* newHead = new(ListNode);
+        ListNode* tail = newHead;
+        while(l2) {
+            tail->next = l1;
+            l1 = l1->next;
+            tail = tail->next;
+
+            tail->next = l2;
+            l2 = l2->next;
+            tail = tail->next;
+        }
+        tail->next = l1;
+        tail = newHead->next;
+        delete newHead;
+        return tail;
+    }
+};
+
+class Solution8 {
+public:
+    int firstMissingPositive(std::vector<int>& nums) {
+        // 现将所有的负数变为正数
+        int n = nums.size();
+        for(int& e : nums){
+            if(e <= 0) e = n + 1;
+        }
+
+        // 遍历数组，将小于N+1的正数映射到下标位置，并将对应的值改为负数
+        // 因为有的数可能已经被改为了负数，但是我们还得标记他，所以先计算出正数，然后进行标记
+        for(int i=0; i<n; ++i){
+            int num = std::abs(nums[i]);
+            if(num < n + 1) {
+                nums[num - 1] = -std::abs(nums[num - 1]);
+            }
+        }
+
+        // 最后遍历一次数组，得出答案
+        int ret = 0;
+        for(int i=0; i<n; ++i){
+            if( nums[i] > 0) return i + 1;
+        }
+        return n + 1;
+    }
+    // 思路就是用下标来表示1~n这正整数。
+    // 让所有负数变为N+1，随后遍历数组，将小于N+1的正数映射到对应的下标位置，也就是x-1.
+    // 将该位置的数变为负数。
+    // 最后，只需要再遍历一次数组，如果所有都是负数，说明小于N+1的所有正数都出现了，结果就是N+1
+    // 反之，第一个正数的下标+1就是结果
+};
+
+class Solution9 {
+public:
+    int numDecodings(std::string s) {
+        int n = s.size();
+        std::vector<int> dp(n + 1);
+
+        // 初始化
+        dp[0] = 1;
+        dp[1] = s[0] != '0';
+
+        for(int i=2; i<=n; ++i) {
+            if(s[i - 1] != '0') dp[i] += dp[i-1];
+
+            int val = s[i - 1] - '0';
+            int prev = s[i - 2] - '0';
+            if(prev*10 + val >= 10 && prev*10 + val <= 26) dp[i] += dp[i-2];
+        }
+        return dp[n];
+    }
+    int _numDecodings(std::string s) {
+        int n = s.size();
+        std::vector<int> dp(n);
+        int s0 = s[0] - '0';
+        int s1 = s[1] - '0';
+
+        // 初始化
+        dp[0] = s[0] != '0';
+        if(n <= 1) return dp[0];
+
+        if(s[1] != '0' && s[0] != '0') dp[1] += 1;
+        if(s0*10 + s1 >= 10 && s0*10 + s1 <= 26) dp[1] += 1;
+
+        for(int i=2; i<=n; ++i) {
+            int val = s[i] - '0';
+            int prev = s[i-1] - '0';
+            if(s[i] != '0') dp[i] += dp[i-1];
+            if(prev*10 + val >= 10 && prev*10 + val <= 26) dp[i] += dp[i-2];
+        }
+        return dp[n - 1];
+    }
+    // dp[i] 表示第i个位置时，一共有多少种解码方式
+    // 到达i位置时，要么直接解码i位置，要么解码i和i-1这两个位置
+    // s[i] 在1~9之间，则解码成功，解码方式就等于0~i-1所有的解码总和
+    // s[i] 和 s[i-1]一块解码，则数字要在10~26之间，解码成功，两者作为一个字符，就等于0~i-2所有的解码总和 
+    // dp[i] = dp[i - 1] + dp[i - 2] 前提是两者都可以解码
+};
+
+class Solution10 {
+public:
+    int uniquePaths(int m, int n) {
+        std::vector<std::vector<int>> dp(m + 1,std::vector<int>(n+1));
+        dp[0][1] = 1;
+
+        for(int i = 1; i<=m; ++i) {
+            for(int j=1; j<=n ; ++j) {
+                dp[i][j] = dp[i-1][j] + dp[i][j-1];
+            }
+        }
+        return dp[m][n];
     }
 };
