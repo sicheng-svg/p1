@@ -1,5 +1,17 @@
-test:typeInference.cc
+all: type constexpr static_assert tuple
+
+type:typeInference.cc
 	g++ -o $@ $^ -std=c++14
-.PHONY: clean
+
+constexpr:constexpr.cc
+	g++ -o $@ $^ -std=c++17
+
+static_assert:static_assert.cc
+	g++ -o $@ $^ -std=c++11
+
+tuple:tuple.cc
+	g++ -o $@ $^ -std=c++11
+
+.PHONY: clean all
 clean:
-	rm -f test
+	rm -f type constexpr static_assert tuple
