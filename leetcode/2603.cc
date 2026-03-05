@@ -2,6 +2,7 @@
 #include <vector>
 #include <queue>
 #include <deque>
+#include <unordered_map>
 #include <algorithm>
 
 class Solution {
@@ -356,5 +357,66 @@ public:
             }
         }
         return dp[m][n];
+    }
+};
+
+class Solution11 {
+public:
+    std::vector<std::vector<std::string>> groupAnagrams(std::vector<std::string>& strs) {
+        std::unordered_map<std::string, std::vector<std::string>> hash;
+        for(auto& str : strs) {
+            std::string tmp = str;
+            sort(tmp.begin(), tmp.end());
+            hash[tmp].push_back(str);
+        }
+        std::vector<std::vector<std::string>> ret;
+        for(auto& [key, value] : hash) {
+            ret.push_back(value);
+        }
+        return ret;
+    }
+};
+
+class Node {
+public:
+    int val;
+    std::vector<Node*> children;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+    }
+
+    Node(int _val, std::vector<Node*> _children) {
+        val = _val;
+        children = _children;
+    }
+};
+
+class Solution12 {
+public:
+    std::vector<std::vector<int>> levelOrder(Node* root) {
+        if(root == nullptr) return {};
+        std::vector<std::vector<int>> ret;
+        std::queue<Node*> q;
+        q.push(root);
+
+        while(!q.empty()) {
+            int curLevelSize = q.size();
+            std::vector<int> curLevelList;
+            curLevelList.reserve(curLevelSize);
+
+            while(curLevelSize--) {
+                Node* node = q.front();q.pop();
+                curLevelList.emplace_back(node->val);
+
+                for(auto n : node->children) {
+                    q.push(n);
+                }
+            }
+            ret.emplace_back(curLevelList);
+        }
+        return ret;
     }
 };
