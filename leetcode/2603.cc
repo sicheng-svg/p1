@@ -4,6 +4,7 @@
 #include <deque>
 #include <unordered_map>
 #include <algorithm>
+#include <iostream>
 
 class Solution {
 public:
@@ -420,3 +421,115 @@ public:
         return ret;
     }
 };
+
+// 定义双链表节点
+
+struct DLikeNode{
+    int _key, _value;
+    DLikeNode* _prev;
+    DLikeNode* _next;
+    DLikeNode():_key(0), _value(0), _prev(nullptr), _next(nullptr){}
+    DLikeNode(int key, int value):_key(key), _value(value), _prev(nullptr), _next(nullptr){}
+};
+
+class LRUCache {
+public:
+    LRUCache(int capacity):_capacity(capacity), _size(0) {
+        // 创建虚拟头节点和尾节点
+        _head = new DLikeNode();
+        _tail = new DLikeNode();
+        // 使之成为双链表
+        _head->_next = _tail;
+        _head->_prev = _tail;
+        _tail->_prev = _head;
+        _tail->_next = _head;
+    }
+    
+    int get(int key) {
+        int is_exists = _chche.count(key);
+        if(!is_exists) return -1;
+
+        DLikeNode* node = _chche[key];
+        int value = node->_value;
+        del(node);
+        DLikeNode* newNode = new DLikeNode(key, value);
+        insert(newNode);
+        return value;
+    }
+    
+    void put(int key, int value) {
+        int is_exists = _chche.count(key);
+        if(is_exists){
+            // 已经存在，删除原本的，插入一个新的
+            DLikeNode* node = _chche[key];
+            del(node);
+        }
+
+        if(_size + 1 > _capacity) {
+            // 如果满了，此时删除倒数第一个节点，将新节点插入到头部
+            delLeastRecentlyUsed();
+        }
+        // key不存在，则新建一个节点，并头插到双链表中
+        DLikeNode* newNode = new DLikeNode(key, value);
+        _chche[key] = newNode; // 存入哈希表中
+        
+        // 将新节点头插
+        insert(newNode);
+    }
+private:
+    void insert(DLikeNode* newNode){
+            newNode->_next = _head->_next;
+            newNode->_prev = _head;
+            _head->_next->_prev = newNode;
+            _head->_next = newNode;
+            _size += 1;
+            _chche[newNode->_key] = newNode;
+    }
+
+    void delLeastRecentlyUsed(){
+        del(_tail->_prev);
+    }
+
+    void del(DLikeNode* node){
+        // 记录待删除节点的前一个和后一个
+        DLikeNode* next = node->_next;
+        DLikeNode* prev = node->_prev;
+        prev->_next = next;
+        next->_prev = prev;
+        _size -= 1;
+        _chche.erase(node->_key);
+        delete node;
+    }
+private:
+    std::unordered_map<int, DLikeNode*> _chche;
+    DLikeNode* _head;
+    DLikeNode* _tail;
+    int _size;
+    int _capacity;
+};
+
+int main(){
+    LRUCache cache(2);
+    // cache.put(1, 1);
+    // cache.put(2, 2);
+
+    // std::cout << "get1: " << cache.get(1) << std::endl;
+
+    // cache.put(3, 3);
+    // std::cout << "get2: " << cache.get(2) << std::endl;
+    // cache.put(4, 4);
+    // std::cout << "get1: " << cache.get(1) << std::endl;
+    // std::cout << "get3: " << cache.get(3) << std::endl;
+    // std::cout << "get4: " << cache.get(4) << std::endl;
+
+    cache.put(1, 0);
+    cache.put(2, 2);
+    std::cout << "get1: " << cache.get(1) << std::endl;
+    cache.put(3,3 );
+    std::cout << "get2: " << cache.get(2) << std::endl;
+    cache.put(4, 4);
+    std::cout << "get1: " << cache.get(1) << std::endl;
+    std::cout << "get3: " << cache.get(3) << std::endl;
+    std::cout << "get4: " << cache.get(4) << std::endl;
+
+}
