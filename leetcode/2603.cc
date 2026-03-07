@@ -508,6 +508,77 @@ private:
     int _capacity;
 };
 
+class Solution13 {
+public:
+    
+    bool CheckPermutation(std::string s1, std::string s2) {
+        if(s1.length() != s2.length()) return false;
+        int hash[26];
+        for(char ch : s1) {
+            hash[ch-'a'] += 1;
+        }
+
+        for(char ch : s2){
+            hash[ch - 'a'] -= 1;
+            if(hash[ch - 'a'] < 0) return false;
+        }
+       return true;
+
+        // 排序之后，判断是否相等
+        // sort(s1.begin(), s1.end());
+        // sort(s2.begin(), s2.end());
+        // return s1 == s2;
+    }
+};
+
+class Solution14 {
+public:
+    int dx[4] = {1, 0, 0, -1};
+    int dy[4] = {0, 1, -1, 0};
+    int numIslands(std::vector<std::vector<char>>& grid) {
+        // 遍历数组，如果遇到1开始广度优先遍历，将1开始的四周所有1添加到队列中
+        // 通时更新vis数组，表示这个位置已经扫描过了。
+        // 每进行一次广度优先遍历，就代表有一个陆地
+
+        int row = grid.size();
+        int col = grid[0].size();
+        std::vector<std::vector<bool>> vis(row, std::vector<bool>(col));
+        int ans = 0;
+
+        for(int i=0; i<row; ++i) {
+            for(int j=0; j<col; ++j) {
+                if(vis[i][j] == false && grid[i][j] == '1'){
+                    // 发现陆地
+                    ans++;
+                    vis[i][j] = true;
+
+                    // 将初始位置添加到队列中
+                    std::queue<std::pair<int, int>> q;
+                    q.push({i, j});
+
+                    // 开始广度优先遍历
+                    while(!q.empty()){
+                        auto [r, c] = q.front();
+                        q.pop();
+
+                        // 向四周开始发散，将1添加到队列中，并将其vis标记为true
+                        for(int z=0; z<4; ++z){
+                            int a = r + dx[z], b = c + dy[z];
+                            // 坐标合法，判断是否是陆地
+                            if(a >=0 && a <row && b >= 0 && b < col
+                                && vis[a][b] == false && grid[a][b] == '1'){
+                                    vis[a][b] = true;
+                                    q.push({a, b});
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return ans;
+    }
+};
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
