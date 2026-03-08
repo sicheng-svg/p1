@@ -579,6 +579,113 @@ public:
     }
 };
 
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution15 {
+public:
+    std::unordered_map<int, TreeNode*> hash;
+    std::unordered_map<int, bool> vis;
+    void dfs(TreeNode* root) {
+        if(root->left){
+            hash[root->left->val] = root;
+            dfs(root->left);
+        }
+        if(root->right){
+            hash[root->right->val] = root;
+            dfs(root->right);
+        }
+    }
+
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        hash[root->val] = nullptr;
+        // 首先遍历二叉树，将父子关系保存在哈希表中
+        dfs(root);
+
+        // 在哈希表中，反查p的父亲，同时在vis中进行标记，表示该节点是他的祖先
+        while(p != nullptr) {
+            vis[p->val] = true; // 先讲自己标记，因为自己也是自己的祖先节点
+            p = hash[p->val]; // 更新为父节点
+        }
+
+        while(q != nullptr) {
+            if(vis[q->val]) return q;
+            q = hash[q->val]; // 获取父节点
+        }
+        return nullptr;
+    }
+
+    TreeNode* _lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if(root == nullptr || root == q || root == p) {
+            return root;
+        }
+
+        // 分别去左右子树查找
+        TreeNode* left = lowestCommonAncestor(root->left, p, q);
+        TreeNode* right = lowestCommonAncestor(root->right, p, q);
+
+        if(left == nullptr) return right;
+        if(right == nullptr) return left;
+        return root;
+    }
+};
+
+class Solution16 {
+public:
+    std::vector<int> findMinHeightTrees(int n, std::vector<std::vector<int>>& edges) {
+        if(n == 1) return {0};
+        // 构建邻接表和度数表
+        std::vector<std::vector<int>> adj(n);
+        std::vector<int> degree(n);
+        for(const auto& edge : edges){
+            degree[edge[0]]++;
+            degree[edge[1]]++;
+
+            adj[edge[0]].push_back(edge[1]);
+            adj[edge[1]].push_back(edge[0]);
+        }
+
+        // 统计度为1的节点 
+        std::queue<int> q;
+        for(int i=0; i<n; ++i){
+            if(degree[i] == 1) q.push(i);
+        }
+
+        // 开始剥洋葱，将度为1的节点删除，同时更新邻接表，并将新的度为1的节点添加到队列中
+        while(n > 2) {
+            int size = q.size();
+            n -= size;
+
+            for(int i=0; i<size; ++i) {
+                int node = q.front();
+                q.pop();
+
+                for(int del : adj[node]){ // 这里的del是当前度为1节点的邻居。邻居要将这个节点删除掉
+                    // 邻居的度也要减少
+                    // 如果节点的度变为1，则将其插入到队列中
+                    if(--degree[del] == 1){
+                        q.push(del);
+                    }
+                }
+            }
+        }
+        // 队列中剩下的就是中心节点
+        vector<int> res;
+        while (!q.empty()) {
+            res.push_back(q.front());
+            q.pop();
+        }
+        return res;
+
+    }
+};
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
