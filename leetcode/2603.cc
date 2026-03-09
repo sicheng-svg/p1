@@ -676,13 +676,44 @@ public:
             }
         }
         // 队列中剩下的就是中心节点
-        vector<int> res;
+        std::vector<int> res;
         while (!q.empty()) {
             res.push_back(q.front());
             q.pop();
         }
         return res;
 
+    }
+};
+
+class Solution17 {
+public:
+    int climbStairs(int n) {
+        std::vector<int> dp(n+1);
+        dp[0] = 1;
+        dp[1] = 1;
+        for(int i=2; i<=n; ++i) {
+            dp[i] = dp[i-1] + dp[i-2];
+        }
+        return dp[n];
+    }
+    // dp[i] 表示到达第i层一共多少种方法
+    // dp[i] = dp[i-1] + dp[i-2] 要么从前一个位置走一步过来，要么从前两个位置走两步过来
+};
+
+class Solution18 {
+public:
+    std::vector<std::vector<int>> generate(int numRows) {
+        std::vector<std::vector<int>> vv(numRows);
+        for(int i=0; i<numRows; ++i){
+            vv[i].resize(i+1, 1); // 设置容量并初始化为1
+        }
+        for(int i=2; i<numRows; ++i){
+            for(int j=1; j<vv[i].size() - 1; ++j) {
+                vv[i][j] = vv[i-1][j-1] + vv[i-1][j];
+            }
+        }
+        return vv;
     }
 };
 
