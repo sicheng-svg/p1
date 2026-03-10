@@ -717,6 +717,41 @@ public:
     }
 };
 
+class Solution19 {
+public:
+    int maxProfit(std::vector<int>& prices) {
+        int size = prices.size();
+        std::vector<int> dp(size + 1);
+        int minprice = prices[0];
+
+        dp[0] = 0;
+        for(int i=1; i<size; ++i) {
+            minprice = std::min(minprice, prices[i]);
+            dp[i] = std::max(dp[i-1], prices[i] - minprice);
+        }
+        return dp[size-1];
+    }
+    // dp[i]表示前i天的最大利润
+    // dp[i] = max(dp[i-1], dp[i] - minprice)
+    // 所以，dp[i]要么还是昨天的利润，要么就是prices[i]-minprice
+};
+
+class Solution20 {
+public:
+    int fib(int n) {
+        if(n < 1) return 0;
+        int a = 0, b = 1, c = 1;
+        for(int i=3; i<=n; ++i){
+            a = b;
+            b = c;
+            c = a + b;
+        }
+        return c;
+    }
+    // dp[i]表示第i个斐波那契数
+    // dp[i] = dp[i-1] + dp[i-2];
+};
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
