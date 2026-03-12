@@ -752,6 +752,56 @@ public:
     // dp[i] = dp[i-1] + dp[i-2];
 };
 
+class Solution21 {
+public:
+    int maxProfit(std::vector<int>& prices) {
+        int n = prices.size();
+        int dp[n][2];
+        dp[0][0] = 0, dp[0][1] = -prices[0];
+        for(int i=1; i<n; ++i){
+            dp[i][0] = std::max(dp[i-1][0], dp[i-1][1] + prices[i]);
+            dp[i][1] = std::max(dp[i-1][1], dp[i-1][0] - prices[i]);
+        }
+        return dp[n-1][0];
+    }
+    // 因为可以多次进行买卖股票，但是同一天内，手上最多只能有一只股票
+    // dp[i][0]表示第i天，手上没有股票时的最大利润；dp[i][1]表示第i天，手上还有一支股票的最大利润
+    // dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i])
+    // dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i])
+};
+
+
+class Solution22 {
+public:
+    int eatenApples(std::vector<int>& apples, std::vector<int>& days) {
+        int n = apples.size();
+        int ans = 0;
+
+        std::priority_queue<std::pair<int,int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> pq;
+        for(int i=0; i<n || !pq.empty(); ++i){
+            // 1、当天有苹果，将该苹果和过期时间插入
+            if(i < n && apples[i] > 0){
+                pq.push({i + days[i], apples[i]});
+            }
+            // 2.将过期的食物踢出去
+            while(!pq.empty() && pq.top().first <= i){
+                pq.pop();
+            }
+
+            // 3.吃掉最快过期的
+            if(!pq.empty()) {
+                auto [expired, count] = pq.top();
+                pq.pop();
+
+                if(count - 1 > 0) {
+                    pq.push({expired, count - 1});
+                }
+                ans++;
+            }
+        }
+        return ans;
+    }
+};
 
 
 int main(){
