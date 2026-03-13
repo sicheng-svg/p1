@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <algorithm>
 #include <iostream>
+#include <climits>
+#include <limits>
 
 class Solution {
 public:
@@ -803,6 +805,67 @@ public:
     }
 };
 
+class Solution23 {
+public:
+    int storeWater(std::vector<int>& bucket, std::vector<int>& vat) {
+        int n = bucket.size();
+        // 找到最大的限额，执行这么多次一定满足所有限额要求
+        int maxVat = *std::max_element(vat.begin(), vat.end()); 
+        if(maxVat == 0) return 0;
+        
+        //int res = INT_MAX;
+        int res = std::numeric_limits<int>::max();
+        for(int k=1; k<=maxVat && k<res; ++k){
+            // 用来记录在当前次数下，需要进行多少次升级操作
+            int t = 0;
+            // 先对bucket进行升级
+            for(int i=0; i<bucket.size(); ++i){
+                t += std::max(0, (vat[i]+k-1)/k - bucket[i]);
+            }
+            res = std::min(res, t+k);
+        }
+        return res;
+    }
+    // bucket[i]表示第i个水缸所配备水桶的大小
+    // vat[i]表示第i个水缸的最低水平线
+    // 需要让所有的水缸都满足 >= vat[i]
+    // 解题思路：假设一共进行了K次蓄水操作。那么bucket[i] 必须满足 vat[i]/k
+    // 而bucket[i]的升级次数 = max(0, vat[i]/k - bucket[i])
+    // 所以我们依次枚举所有可能的k，在其基础上，获取所有桶的升级次数，随后+上k就是本次的最小操作数
+    // 但是计算升级操作时，可能不是整数。此时要采取向上取整，因为bucket[i]表示到水量，可以多到，不能少到
+};
+
+class Solution24 {
+public:
+    int nthSuperUglyNumber(int n, std::vector<int>& primes) {    
+        std::vector<long> dp(n);
+        dp[0] = 1;
+        std::vector<int> pointers(primes.size()); // 下标表示primes，内容指向dp
+        for(int i=1; i<n; ++i){
+            // 找到每个生产线所能产出的最小的丑数
+            long tmp = LONG_MAX;
+            for(int j=0; j<primes.size(); ++j){
+                tmp = std::min(tmp, dp[pointers[j]] * primes[j]);
+            }
+            // 保存丑数
+            dp[i] = tmp;
+
+            // 去重，更新指针
+            for(int j=0; j<primes.size(); ++j){
+                if(dp[pointers[j]] * primes[j] == tmp) pointers[j]++; // 指向下一个丑数
+            }
+        }
+        return dp[n-1];
+    }
+
+    // dp[i]表示第i个丑数。为了按照升序，找到第n个丑数，我们必须让找到的丑数一个比一个大。
+    // 新的丑数 = 旧丑数 * primes中的某个质数。
+    // 为了每一次找到的丑数最小。我们使用一个pointes数组，该数组与primes数组对应位置进行结合，用来得出丑数
+    // 每一列是一个生产线。表示当前的丑数 * primes
+    // 如果找到了一个最小的丑数。那么该位置的pointer就得++，指向下一个丑数。
+    // 在此过程中，要进行去重。如果某几列得出了同一个最小丑数，此时这些位置都要指向下一个丑数。
+    // 否则，没有移动的指针，接下来还会计算出上一次算出的丑数。
+};
 
 int main(){
     LRUCache cache(2);
