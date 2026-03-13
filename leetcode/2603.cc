@@ -2,6 +2,7 @@
 #include <vector>
 #include <queue>
 #include <deque>
+#include <unordered_set>
 #include <unordered_map>
 #include <algorithm>
 #include <iostream>
@@ -865,6 +866,61 @@ public:
     // 如果找到了一个最小的丑数。那么该位置的pointer就得++，指向下一个丑数。
     // 在此过程中，要进行去重。如果某几列得出了同一个最小丑数，此时这些位置都要指向下一个丑数。
     // 否则，没有移动的指针，接下来还会计算出上一次算出的丑数。
+};
+
+class Solution25 {
+public:
+    int numSquares(int n) {
+        std::vector<long> dp(n+1, std::numeric_limits<int>::max());
+        dp[0] = 0;
+        for(int i=1;i<=n; ++i){
+            for(int j=0; j*j<=i; ++j){
+                dp[i] = std::min(dp[i], dp[i-j*j]+1);
+            }
+        }
+        return dp[n];
+    }
+};
+
+class Solution26 {
+public:
+    bool wordBreak(std::string s, std::vector<std::string>& wordDict) {
+        std::unordered_set<std::string> hash(wordDict.begin(), wordDict.end());
+        int n = s.size();
+        std::vector<bool> dp(n+1, false);
+        dp[0] = true;
+        
+        for(int i=1; i<=n; ++i){
+            for(int j=0; j<i; ++j){
+                if(dp[j] && hash.find(s.substr(j, i-j)) != hash.end()){
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        return dp[n];
+    }
+    // dp[i]表示s的前i个字符是否可以被dict中的表示
+    // 将dp[i]从某个地方切开，比如j。如果dp[j]可以被表示，并且j~i-1的能在字典中找到。说明dp[i]就可以被表示
+};
+
+class Solution27 {
+public:
+    int lengthOfLIS(std::vector<int>& nums) {
+        int n = nums.size();
+        std::vector<int> dp(n, 1);
+        for(int i=0; i<n; ++i){
+            for(int j=0; j<i; ++j){
+                if(j<i && nums[j] < nums[i]){
+                    dp[i] = std::max(dp[i], dp[j]+1);
+                }
+            }
+        }
+        return *std::max_element(dp.begin(), dp.end());
+    }
+    // dp[i]第i个数，并且符合递增
+    // dp[i] = nums[i] > dp[i-1]?nums[i]:dp[i]
+    // 结束后可能会有多个重复。去重后返回size
 };
 
 int main(){
