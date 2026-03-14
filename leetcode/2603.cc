@@ -923,6 +923,67 @@ public:
     // 结束后可能会有多个重复。去重后返回size
 };
 
+class Solution28 {
+public:
+    int _maxProduct(std::vector<int>& nums) {
+        int n = nums.size();
+        std::vector<int> dpMax(n);
+        std::vector<int> dpMin(n);
+        dpMax[0] = nums[0];
+        dpMin[0] = nums[0];
+
+        for(int i=1; i<n; ++i){
+            dpMax[i] = std::max({nums[i], dpMax[i-1]*nums[i], dpMin[i-1]*nums[i]});
+            dpMin[i] = std::min({nums[i], dpMax[i-1]*nums[i], dpMin[i-1]*nums[i]});
+        }
+        return *std::max_element(dpMax.begin(), dpMax.end());
+    }
+
+    int maxProduct(std::vector<int>& nums) {
+        // 因为dp数组只依赖前一个的值，所以可以进行空间优化，使用两个变量来存储dp表
+        int n = nums.size();
+        int dpMax = nums[0];
+        int dpMin = nums[0];
+        int res = nums[0];
+
+        for(int i=1; i<n; ++i){
+            // 保存上一次的最大和最小
+            int tmpMax = dpMax;
+            int tmpMin = dpMin;
+            // 更新这一次的
+            dpMax = std::max({nums[i], tmpMax*nums[i], tmpMin*nums[i]});
+            dpMin = std::min({nums[i], tmpMax*nums[i], tmpMin*nums[i]});
+            res = std::max(res, dpMax);
+        }
+        return res;
+    }
+};
+
+class Solution29 {
+public:
+    bool canPartition(std::vector<int>& nums) {
+        int sum = 0;
+        for(int val:nums) sum += val;
+        if(sum%2 != 0) return false;
+
+        int target = sum / 2;
+        std::vector<int> dp(target+1, false);
+        dp[0] = true;
+        for(int num:nums){
+            for(int j=target; j>=num; --j){
+                if(dp[j-num]){
+                    dp[j] = true;
+                }
+            }
+        }
+        return dp[target];
+    }
+    // 要想满足两个子集的和相等，则数组的和必须是偶数，如果不是偶数则直接返回false
+    // 所以我们的目标就是找到一个子集，和为target即可
+    // dp[i]表示是否有子集满足和为i
+    // 我们才去倒叙遍历数组，dp[i] = dp[i] || dp[i-num]，如果我们选了num，则构成i就只需要i-num为真即可。
+};
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
