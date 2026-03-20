@@ -984,6 +984,298 @@ public:
     // 我们才去倒叙遍历数组，dp[i] = dp[i] || dp[i-num]，如果我们选了num，则构成i就只需要i-num为真即可。
 };
 
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    // 哈希表存储一个链表节点，在遍历另一个链表，第一个出现的就是相交节点。
+    // 如果没有找到，则返回nullptr
+    ListNode *_getIntersectionNode(ListNode *headA, ListNode *headB) {
+        std::unordered_set<ListNode*> hash;
+        ListNode* cur = headA;
+        while(cur){
+            hash.emplace(cur);
+            cur = cur->next;
+        }
+
+        cur = headB;
+        while(cur){
+            if(hash.count(cur)) return cur;
+            cur = cur->next;
+        }
+        return nullptr;
+    }
+
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        if(!headA || !headB) return nullptr;
+        ListNode *pA = headA, *pB = headB;
+        while(pA != pB){
+            pA = pA ? pA->next : headB;
+            pB = pB ? pB->next : headA;
+        }
+        return pA;
+    }
+};
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    // 虚拟头节点
+    ListNode* _reverseList(ListNode* head) {
+        if(!head) return nullptr;
+        ListNode *dummy = new ListNode;
+        ListNode* next = head->next;
+        while(head){
+            head->next = dummy->next;
+            dummy->next = head;
+            head = next;
+            if(next) next = next->next;
+        }
+        head = dummy->next;
+        delete dummy;
+        return head;
+    }
+
+    // 直接使用指针交换
+    ListNode* reverseList(ListNode* head) {
+        ListNode *prev = nullptr, *cur = head;
+        while(cur){
+            ListNode* next  = cur->next;
+            cur->next = prev;
+            prev = cur;
+            cur = next;
+        }
+        return prev;
+    }
+};
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+        // 1.先使用快慢指针，找到中间节点
+        // 如果是奇数，则slow就是中间节点；如果是偶数，则是中间靠右的节点
+        ListNode *fast = head, *slow = head;
+        while(fast && fast->next) {
+            fast = fast->next->next;
+            slow = slow->next;
+        }
+
+        // 2.然后反转后半部分
+        ListNode *prev = nullptr, *cur = slow->next;
+        while(slow){
+            ListNode* next = slow->next;
+            slow->next = prev;
+            prev = slow;
+            slow = next;
+        }
+        // 3.同时从开始和中间部分，如果后半部分能走到结尾则说明是回文链表
+        cur = head;
+        while(prev) {
+            if(cur->val != prev->val) return false;
+            cur = cur->next;
+            prev = prev->next;
+        }
+        return true;
+    }
+};
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        ListNode *fast = head, *slow = head;
+        while(fast && fast->next){
+            fast = fast->next->next;
+            slow = slow->next;
+            if(fast == slow) return true;
+        }   
+        return false;
+    }
+};
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode *_detectCycle(ListNode *head) {
+        // 使用哈希表存储每一个访问过的节点。第一个重复访问的节点就是入环节点
+        std::unordered_set<ListNode*> visited;
+        while(head) {
+            if(visited.count(head)) return head;
+            visited.emplace(head);
+            head = head->next;
+        }
+        return nullptr;
+    }
+
+    ListNode *detectCycle(ListNode *head) {
+        ListNode *fast = head, *slow = head;
+        while(fast && fast->next) {
+            fast = fast->next->next;
+            slow = slow->next;
+
+            // 说明是环形链表，相遇后，head和slow同时走，相遇位置就是入环点
+            if(fast == slow){
+                while(slow != head) {
+                    slow = slow->next;
+                    head = head->next;
+                }
+                return slow;
+            }
+        }
+        return nullptr;
+    }
+};
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    // 递归
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        if(!list1 || !list2) return list1 ? list1 : list2;
+
+        if(list1->val < list2->val){
+            list1->next = mergeTwoLists(list1->next, list2);
+            return list1;
+        }else{
+            list2->next = mergeTwoLists(list1, list2->next);
+            return list2;
+        }
+    }
+
+    // 迭代
+    ListNode* _mergeTwoLists(ListNode* list1, ListNode* list2) {
+        if(!list1 || !list2) return list1 ? list1 : list2;
+
+        ListNode *head = nullptr, *tail = nullptr;
+        while(list1 && list2){
+            if(list1->val <= list2->val){
+                if(head == nullptr) {
+                    head = list1;
+                    tail = head;
+                }else{
+                    tail->next = list1;
+                    tail = tail->next;  
+                }
+                list1 = list1->next;
+            }else{
+                if(head == nullptr) {
+                    head = list2;
+                    tail = head;
+                }else{
+                    tail->next = list2;
+                    tail = tail->next;  
+                }
+                list2 = list2->next;
+            }
+        }
+
+        // 判断那个链表不为空，将剩余部分直接连接在tail后面
+        if(list1){
+            tail->next = list1;
+        }else{
+            tail->next = list2;
+        }
+        return head;
+    }
+};
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode *dummy = new ListNode;
+        ListNode *tail = dummy;
+        int b = 0;
+        while(l1 && l2){
+            int sum = l1->val + l2->val + b;
+            int a = sum % 10;
+            b = sum / 10;       // 进位
+            ListNode *newNode = new ListNode(a);
+            tail->next = newNode;
+            tail = newNode;
+            l1 = l1->next;
+            l2 = l2->next;
+        }
+        ListNode *last = l1;
+        if(!l1) last = l2;
+
+        while(last){
+            int sum = last->val + b;
+            ListNode *newNode = new ListNode(sum % 10);
+            b = sum / 10;
+            tail->next = newNode;
+            tail = newNode;
+            last = last->next;
+        }
+        if(b){
+            ListNode *newNode = new ListNode(b % 10);
+            tail->next = newNode;
+            tail = newNode;
+        }
+
+        last = dummy->next;
+        delete dummy;
+        return last;
+    }
+};
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
