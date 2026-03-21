@@ -1276,6 +1276,247 @@ public:
     }
 };
 
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    // 使用快慢指针来解决，引入dummy，让fast先走n+1步。
+    // 然后slow 和fast同步走，当fast为空时，slow的位置就是待删除的前一个位置
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode dummy(0, head);
+        ListNode *fast = &dummy, *slow = &dummy;
+        for(int i=0; i<=n; ++i){
+            fast = fast->next;
+        }
+        while(fast){
+            slow = slow->next;
+            fast = fast->next;
+        }
+        ListNode *del = slow->next;
+        slow->next = del->next;
+        delete del;
+        return dummy.next;
+    }
+
+    ListNode* _removeNthFromEnd(ListNode* head, int n) {
+        if(head->next == nullptr && n == 1) return nullptr;
+
+        // 1.求出一共有多少个节点
+        ListNode *cur = head;
+        int size = 0;
+        while(cur){
+            ListNode *next = cur->next;
+            size++;
+            cur = next;
+        }
+        // 2.将倒数节点转换为正数
+        int target = size - n;
+        cur = head;
+        ListNode *prev = nullptr;
+        while(target--){
+            prev = cur;
+            cur = cur->next;
+        }
+        // 此时cur的位置就是待删除的节点
+        if(!prev){
+            ListNode *next = cur->next;
+            delete cur;
+            return next;
+        }
+        prev ->next = cur->next;
+        delete cur;
+        return head;
+    }
+};
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    // 使用递归进行两两交换
+    // 我们看待链表，只看当前的两个，以及后面的链
+    // 我们相信swapPairs一定可以给我们将后面的链给两两反转。在本次，我们只需要将head和second反转即可
+    ListNode* swapPairs(ListNode* head) {
+        // 递归终止条件
+        if(!head || !head->next) return head;
+
+        ListNode *second = head->next;
+        head->next = swapPairs(second->next);
+        second->next = head;
+        return second;
+    }
+
+    ListNode* _swapPairs(ListNode* head) {
+        // 借助虚拟头节点
+        if(!head || !head->next) return head;
+
+        ListNode *dummy = new ListNode;
+        dummy->next = head;
+
+        ListNode *prev = dummy;
+        ListNode *cur = head;
+        ListNode *next = cur->next;
+        ListNode *nnext = next->next;
+        while(cur && next){
+            prev->next = next;
+            next->next = cur;
+            cur->next = nnext;
+
+            // 更新指针
+            prev = cur;
+            cur = nnext;
+            if(cur) next = cur->next;
+            if(next) nnext = next->next;
+        }
+
+        head = dummy->next;
+        delete dummy;
+        return head;
+    }
+};
+
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+       ListNode dummy(0, head);
+       ListNode *groupPrev = &dummy;
+       for(;;){
+            // 1.检查够不够k个
+            ListNode *check = groupPrev;
+            for(int i=0; i<k; ++i){
+                check = check->next;
+                if(!check) return dummy.next;
+            }
+
+            // 2.依次反转k个
+            ListNode *prev = nullptr, *cur = groupPrev->next;
+            for(int i=0; i<k; ++i){
+                ListNode *next = cur->next;
+                cur->next = prev;
+                prev = cur;
+                cur = next;
+            }
+
+            // 3. 此时groupPrev是本次的头，要将他变为尾
+            ListNode *groupTail = groupPrev->next; // 原本的头，反转后变为尾
+            groupTail->next = cur; // 尾连到下一次的头
+            groupPrev->next = prev;// 前一组接到反转后的头
+
+            // 4.更新新的一组
+            groupPrev = groupTail;
+       }
+    }
+    ListNode* _reverseKGroup(ListNode* head, int k) {
+        // 1.先检查够不都k个，不够直接返回
+        ListNode *check = head;
+        for(int i=0; i<k; ++i){
+            while(!check) return head;
+            check = check->next;
+        }
+
+        // 2.我们无条件相信该函数可以将后面剩余的部分反转好。
+        // 我们只需要反转当前的即可。
+        ListNode *prev = nullptr, *cur = head;
+        for(int i=0; i<k; ++i){
+            ListNode *next = cur->next;
+            cur->next = prev;
+            prev = cur;
+            cur = next;
+        }
+
+        // 3.此时prev是反转后的新头，head是尾，让head->next指向后面部分
+        head->next = reverseKGroup(cur, k);
+        return prev;
+    }
+};
+
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* next;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
+};
+*/
+
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        std::unordered_map<Node*, Node*> map;
+        for(Node *cur=head; cur; cur=cur->next){
+            map[cur] = new Node(cur->val);
+        }
+        for(Node* cur = head; cur; cur=cur->next){
+            map[cur]->next = map[cur->next];
+            map[cur]->random = map[cur->random];
+        }
+        return map[head];
+    }
+
+    Node* _copyRandomList(Node* head) {
+        if(!head) return head;
+
+        std::unordered_map<Node*, Node*> hash;
+        Node dummy(0);
+        Node *cur = head, *tail = &dummy;
+        while(cur){
+            Node *newNode = new Node(cur->val);
+            newNode->next = nullptr;
+            tail->next = newNode;
+            tail = newNode;
+
+            hash[cur] = newNode; // 旧节点 -> 新节点
+            cur = cur->next;
+        }
+
+        cur = head;
+        Node *copy = dummy.next;
+        while(cur){
+            if(cur->random == nullptr) copy->random = nullptr;
+            else{
+                copy->random = hash[cur->random]; // cur->random指向的节点，映射的就是我们需要的新random
+            }
+            cur = cur->next;
+            copy = copy->next;
+        }
+        return dummy.next;
+    }
+};
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
