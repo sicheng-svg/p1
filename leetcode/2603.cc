@@ -1722,6 +1722,56 @@ private:
  * obj->put(key,value);
  */
 
+ class Solution {
+public:
+    // 建大堆，向下调整建堆，从倒数第一个非叶子节点开始向下调整
+    void adjustDown(std::vector<int>& nums, int size, int parent){
+        int child = parent*2 + 1;
+        int val = nums[parent];
+        while(child < size){
+            if(child + 1 < size && nums[child] < nums[child + 1]){
+                child += 1;
+            }
+
+            if(val >= nums[child]) break;
+            // 孩子大于父亲，则将孩子上移
+            nums[parent] = nums[child];
+            parent = child;
+            child = parent*2 + 1;
+        }
+        nums[parent] = val;
+    }
+
+    int findKthLargest(vector<int>& nums, int k) {
+        // 1.从倒数第一个非叶子节点开始向下调整建堆
+        int n = nums.size();
+        for(int i=(n-1-1)/2; i>=0; --i){
+            adjustDown(nums, n, i);
+        }
+
+        // 2.此时所有的数都已大堆的方式存储在数组中。
+        // 从堆顶删除k次，最后一次的数就是结果
+        int ans = nums[0];
+        for(int i=0; i<k; ++i){
+            ans = nums[0];
+
+            std::swap(nums[0], nums.back());
+            nums.pop_back();       
+            adjustDown(nums, nums.size(), 0); 
+        }
+        return ans;
+    }
+
+    int _findKthLargest(vector<int>& nums, int k) {
+        std::priority_queue<int> heap(nums.begin(), nums.end());
+        int ans = 0;
+        while(k--){
+            ans = heap.top();heap.pop();
+        }
+        return ans;
+    }
+};
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
