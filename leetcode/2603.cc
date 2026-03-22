@@ -1517,6 +1517,211 @@ public:
     }
 };
 
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+
+    }
+
+    ListNode* _sortList(ListNode* head) {
+        std::vector<int> nums;
+        ListNode *cur = head;
+        while(cur){
+            ListNode *next = cur->next;
+            nums.emplace_back(cur->val);
+            cur = next;
+        }
+
+        sort(nums.begin(), nums.end());
+
+        cur = head;
+        for(int val:nums){
+            ListNode *next = cur->next;
+            cur->val = val;
+            cur = next;
+        }
+        return head;
+    }
+};
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+
+
+    // 借助priority_queue，默认是大堆，我们升序需要小堆
+    // 先将每一个链表的头节点放入队列中。每一次会取到最小的头结点，然这个节点往后走，插入到队列中
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        auto comp = [](ListNode *l1, ListNode *l2){
+            return l1->val > l2->val;
+        };
+        std::priority_queue<ListNode*, std::vector<ListNode*>, decltype(comp)> q;
+        for(auto node:lists){
+            if(node) q.push(node);
+        }
+
+        ListNode dummy, *tail = &dummy;
+        while(!q.empty()){
+            auto node = q.top(); q.pop();
+            tail->next = node;
+            tail = tail->next;
+            if(node->next) q.push(node->next);
+        }
+        return dummy.next;
+    }
+
+    ListNode* mergeLists(ListNode *l1, ListNode *l2){
+        if(!l1 || !l2) return l1 == nullptr ? l2 : l1;
+
+        ListNode dummy;
+        ListNode *tail = &dummy;
+
+        while(l1 && l2){
+            if(l1->val <= l2->val){
+                tail->next = l1;
+                l1 = l1->next;
+            }else{
+                tail->next = l2;
+                l2 = l2->next;
+            }
+            tail = tail->next;
+        }
+
+        tail->next = l1 ? l1 :l2;
+        return dummy.next;
+    }
+
+    // 合并k个，我们可以两个两个合并。用前两个合并的结果，和第三个继续合并，重复这个过程
+    ListNode* _mergeKLists(vector<ListNode*>& lists) {
+        int n = lists.size();
+        if(n < 1) return nullptr;
+        if(n == 1) return lists[0];
+
+        ListNode *result = mergeLists(lists[0], lists[1]);
+        for(int i=2; i<n; ++i){
+            result = mergeLists(result, lists[i]);
+        }
+        return result;
+    }
+};
+
+// 定义双链表节点
+struct DLikeNode{
+    int _key, _value;
+    DLikeNode* _prev;
+    DLikeNode* _next;
+    DLikeNode():_key(0), _value(0), _prev(nullptr), _next(nullptr){}
+    DLikeNode(int key, int value):_key(key), _value(value), _prev(nullptr), _next(nullptr){}
+};
+
+class LRUCache {
+public:
+    LRUCache(int capacity):_capacity(capacity) {
+        // 创建虚拟头节点和尾节点
+        _head = new DLikeNode;
+        _tail = new DLikeNode;
+        // 使之成为双链表
+        _head->_next = _tail;
+        _tail->_prev = _head;
+    }
+    ~LRUCache(){
+        while(_head){
+            DLikeNode *next = _head->_next;
+            delete _head;
+            _head = next;
+        }
+        _head = _tail = nullptr;
+    }
+    
+    int get(int key) {
+        int is_exists = _chche.count(key);
+        if(!is_exists) return -1;
+
+        // 存在，则保存结果，并接节点插入到头部
+        DLikeNode* node = _chche[key];
+        int value = node->_value;
+        moveToHead(node);
+        return value;
+    }
+    
+    void put(int key, int value) {
+        int is_exists = _chche.count(key);
+        if(is_exists){
+            // 已经存在，删除原本的，插入一个新的
+            DLikeNode* node = _chche[key];
+            node->_value = value;
+            moveToHead(node);
+            return;
+        }
+
+        // key不存在，则新建一个节点，并头插到双链表中
+        if(_chche.size() + 1 > _capacity) {
+            // 如果满了的话，将最后一个节点，移动到头部，更新k和v
+            DLikeNode* node = _tail->_prev;
+            _chche.erase(node->_key); // 将旧的映射关系删除
+            node->_key = key; node->_value = value;
+            moveToHead(node);
+            return;
+        }
+        DLikeNode* newNode = new DLikeNode(key, value);
+        // 将新节点头插
+        insert(newNode);
+    }
+private:
+    void insert(DLikeNode* node){
+        node->_next = _head->_next;
+        node->_prev = _head;
+        _head->_next->_prev = node;
+        _head->_next = node;
+        _chche[node->_key] = node;
+    }
+    void remove(DLikeNode *node){
+        DLikeNode *prev = node->_prev;
+        DLikeNode *next = node->_next;
+        prev->_next = next;
+        next->_prev = prev;
+    }
+
+    void moveToHead(DLikeNode* node){
+        // 将指定节点，迁移至头部
+        remove(node);
+        insert(node);
+    }
+
+    
+private:
+    std::unordered_map<int, DLikeNode*> _chche;
+    DLikeNode* _head;
+    DLikeNode* _tail;
+    int _capacity;
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
