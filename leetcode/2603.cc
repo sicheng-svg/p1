@@ -1772,6 +1772,293 @@ public:
     }
 };
 
+class Solution {
+public:
+    // 建大堆，向下调整建堆，从倒数第一个非叶子节点开始向下调整
+    void adjustDown(std::vector<int>& nums, int size, int parent){
+        int child = parent*2 + 1;
+        int val = nums[parent];
+        while(child < size){
+            if(child + 1 < size && nums[child] < nums[child + 1]){
+                child += 1;
+            }
+
+            if(val >= nums[child]) break;
+            // 孩子大于父亲，则将孩子上移
+            nums[parent] = nums[child];
+            parent = child;
+            child = parent*2 + 1;
+        }
+        nums[parent] = val;
+    }
+
+    int findKthLargest(vector<int>& nums, int k) {
+        // 1.从倒数第一个非叶子节点开始向下调整建堆
+        int n = nums.size();
+        for(int i=(n-1-1)/2; i>=0; --i){
+            adjustDown(nums, n, i);
+        }
+
+        // 2.此时所有的数都已大堆的方式存储在数组中。
+        // 从堆顶删除k次，最后一次的数就是结果
+        int ans = nums[0];
+        for(int i=0; i<k; ++i){
+            ans = nums[0];
+
+            std::swap(nums[0], nums.back());
+            nums.pop_back();       
+            adjustDown(nums, nums.size(), 0); 
+        }
+        return ans;
+    }
+
+    int _findKthLargest(vector<int>& nums, int k) {
+        std::priority_queue<int> heap(nums.begin(), nums.end());
+        int ans = 0;
+        while(k--){
+            ans = heap.top();heap.pop();
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    // 3.快排
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        // 1.统计出现次数
+        std::unordered_map<int, int> map;
+        for(int val:nums){
+            map[val]++;
+        }
+
+        // 2.将剩余的数字提取出来
+        std::vector<int> uniq;
+        for(auto& [key,value]:map){
+            uniq.push_back(key);
+        }
+
+        // 3.快排
+        int left = 0, right = uniq.size()-1;
+        while(left <= right){
+            int pivot = map[uniq[right]];
+            int storeIdx = left; // storeIdx左边都是大于pivot的
+            for(int i=left; i<right; ++i){
+                if(map[uniq[i]] > pivot){
+                    std::swap(uniq[i], uniq[storeIdx]);
+                    storeIdx++;
+                }
+            }
+            std::swap(uniq[storeIdx], uniq[right]);
+
+            if(storeIdx + 1 == k) break;
+            else if(storeIdx + 1 < k) left = storeIdx + 1;
+            else right = storeIdx - 1;
+        }
+        return std::vector<int>(uniq.begin(), uniq.begin()+k);
+    }
+
+    // 2.借助桶排序
+    vector<int> __topKFrequent(vector<int>& nums, int k) {
+        // 1.统计出现次数
+        std::unordered_map<int, int> map;
+        for(int val:nums){
+            map[val]++;
+        }
+
+        // 2.借助桶排序
+        int n = nums.size();
+        std::vector<std::vector<int>> bucket(n+1);
+        for(auto& [key, value]:map){
+            bucket[value].push_back(key);
+        }
+
+        // 3.提取结果
+        std::vector<int> ans;
+        for(int i=n; i>=0 && ans.size() < k; --i){
+            for(int val : bucket[i]){
+                ans.push_back(val);
+            }
+        }
+        return ans;
+    }
+
+    // 1.借助priority_queue
+    vector<int> _topKFrequent(vector<int>& nums, int k) {
+        // 1.统计出现次数
+        std::unordered_map<int, int> map;
+        for(int val:nums){
+            map[val]++;
+        }
+        for(auto[key,value]:map){
+            std::cout << key <<":"<<value << std::endl;
+        }
+
+        std::priority_queue<std::pair<int, int>> heap;
+        for(auto [key, value]:map){
+            heap.push({value,key});
+        }
+
+
+        std::vector<int> ans(k);
+        for(int i=0; i<k; ++i){
+            ans[i] = heap.top().second; heap.pop();
+        }
+        return ans;
+    }
+};
+
+class MedianFinder {
+public:
+    MedianFinder() {
+        
+    }
+    
+    void addNum(int num) {
+        maxHeap.emplace(num); // 数据默认插入左边
+        minHeap.emplace(maxHeap.top());
+        maxHeap.pop();
+
+        if(minHeap.size() > maxHeap.size()){
+            maxHeap.emplace(minHeap.top());
+            minHeap.pop();
+        }
+
+    }
+    
+    double findMedian() {
+        if(maxHeap.size() == minHeap.size()){
+            return (maxHeap.top() + minHeap.top())/2.0;
+        }
+        return maxHeap.top();
+    }
+private:
+    std::priority_queue<int> maxHeap; // 大堆，存储小于中位数的值
+    std::priority_queue<int, std::vector<int>, std::greater<int>> minHeap; // 小堆，存储大于中位数的值
+};
+
+/**
+ * Your MedianFinder object will be instantiated and called as such:
+ * MedianFinder* obj = new MedianFinder();
+ * obj->addNum(num);
+ * double param_2 = obj->findMedian();
+ */
+
+ class Solution {
+public:
+    bool isValid(string s) {
+        std::stack<char> st;
+        for(char c:s){
+            if(c == '(' || c == '{' || c == '['){
+                st.push(c);
+            }
+            else{
+                if(st.empty()) return false;
+
+                char top = st.top();
+                if(c == ')' && top == '(' 
+                || c == '}' && top == '{' 
+                || c == ']' && top == '[') st.pop();
+                else return false;
+            }
+        }
+        return st.empty();
+    }
+};
+
+class MinStack {
+public:
+    MinStack() {
+    }
+    
+    void push(int val) {
+        if(minSt.empty() || val <= minSt.top()){
+            st.push(val);
+            minSt.push(val);
+        }else{
+            st.push(val);
+        }
+    }
+    
+    void pop() {
+        if(st.top() == minSt.top()) {
+            st.pop();
+            minSt.pop();
+        }else{
+            st.pop();
+        }
+    }
+    
+    int top() {
+        return st.top();
+    }
+    
+    int getMin() {
+        return minSt.top();
+    }
+private:
+    std::stack<int> minSt;
+    std::stack<int> st;
+};
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack* obj = new MinStack();
+ * obj->push(val);
+ * obj->pop();
+ * int param_3 = obj->top();
+ * int param_4 = obj->getMin();
+ */
+
+ class Solution {
+public:
+    string decodeString(string s) {
+        std::stack<int> nst;
+        std::stack<string> sst;
+        sst.push("");
+        
+        int n = s.size();   
+        for(int i=0; i<n;){
+            if(isdigit(s[i])){
+                // 1.如果是数字，则将数字提取出来，放入数字栈
+                int tmp = 0;
+                int j = 0;
+                for(j=i; j<n && isdigit(s[j]); ++j){
+                    tmp = tmp*10 + (s[j]-'0');
+                }
+                i = j; // 更新i
+                nst.push(tmp);
+            }else if(s[i] == '['){
+                // 2.如果是左括号，则将后续的字母压入栈中
+                string tmp = "";
+                i++;
+                int j = 0;
+                for(j=i; j<n && s[j] >= 'a' && s[j] <= 'z'; ++j){
+                    tmp += s[j];
+                }
+                i = j;
+                sst.push(tmp);
+            }else if(s[i] == ']') {
+                // 3.如果是右括号，则拿出数字栈顶x，随后将字符串栈顶的s重复x次后，重新压入栈中
+                int count = nst.top(); nst.pop();
+                string tmp = "";
+                while(count--) tmp += sst.top();
+                sst.pop();
+                sst.top() += tmp;
+                i++;
+            }else{
+                // 4.如果直接是字母，则将后续的字母直接追加到sst的栈顶'
+                int j = 0;
+                for(j = i; j < n && s[j] >= 'a' && s[j] <= 'z'; ++j){
+                    sst.top() += s[j];
+                }
+                i = j;
+            }
+        }
+        return sst.top();
+    }
+};
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
