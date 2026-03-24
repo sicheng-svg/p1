@@ -2059,6 +2059,28 @@ public:
     }
 };
 
+class Solution {
+public:
+    vector<int> dailyTemperatures(vector<int>& temperatures) {
+        int n = temperatures.size();
+        std::vector<int> ans(n, 0);
+        std::stack<int> st;
+
+        for(int i=n-1; i>=0; --i){
+            // 找到第一个比当前大的
+            while(!st.empty() && temperatures[st.top()] <= temperatures[i]){
+                st.pop();
+            }
+
+            if(!st.empty()){
+                ans[i] = st.top() - i;
+            }
+            st.push(i);
+        }
+        return ans;
+    }
+};
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
