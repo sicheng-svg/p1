@@ -2081,6 +2081,27 @@ public:
     }
 };
 
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        int n = heights.size();
+        std::stack<int> stk;
+        int ans = 0;
+        for(int i=0; i<=n; ++i){
+            int curHeight = (i == n) ? 0 : heights[i]; 
+            while(!stk.empty() && heights[stk.top()] >= curHeight){
+                // 左侧>右侧高度,可以计算当前栈中的面积
+                int h = heights[stk.top()];stk.pop();
+                int left = stk.empty() ? -1 : stk.top();
+                int width = i - left - 1;
+                ans = std::max(ans, h * width);
+            }
+            stk.push(i);
+        }
+        return ans;
+    }
+};
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
