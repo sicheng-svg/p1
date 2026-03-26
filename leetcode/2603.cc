@@ -2102,6 +2102,93 @@ public:
     }
 };
 
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int left = 0, right = 0, n = s.size();
+        int ans = 0;
+        std::unordered_map<char, int> dict;
+        while(right < n) {
+            // 1.进窗口
+            dict[s[right]]++;
+
+            // 2.判断
+            while(dict[s[right]] > 1){
+                // 3.出窗口
+                dict[s[left]]--;
+                left++;
+            }
+
+            // 3.满足条件更新结果
+            ans = std::max(ans, right - left + 1);
+            right++; // 走到下一个位置
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    vector<int> findAnagrams(string s, string p) {
+        std::unordered_map<char, int> need;
+        std::unordered_map<char, int> window;
+        for(char ch : p) {
+            need[ch]++;
+        } 
+
+        int left = 0;
+        int vaild = 0;
+        std::vector<int> ans;
+        for(int right=0; right<s.size(); ++right){
+            // 进窗口
+            char c = s[right];
+            if(need.count(c)){
+                window[c]++;
+                if(window[c] == need[c]) vaild++;
+            }
+
+            // 窗口大小与p.size()一致时，更新答案，并出窗口
+            if(right - left + 1 == p.size()){
+                // 更新结果
+                if(vaild == need.size()){
+                    ans.emplace_back(left);
+                }
+
+                // 出窗口
+                char d = s[left];
+                if(need.count(d)){
+                    if(window[d] == need[d]){
+                        --vaild;
+                    }
+                    window[d]--;
+                }
+                left++;
+            }
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    int subarraySum(vector<int>& nums, int k) {
+        // 使用前缀和
+        // 当遍历到i位置时，它的前缀和为sum
+        // 我们想要找到和为k的left,right的区间，只需要找到前缀和为sum - k的位置即可
+        std::unordered_map<int, int> prefix_count;
+        prefix_count[0] = 1;
+        int ans = 0, sum = 0;
+        for(int e : nums){
+            sum += e;
+            if(prefix_count.count(sum - k)) {
+                ans += prefix_count[sum-k];
+            }
+            prefix_count[sum]++;
+        } 
+        return ans;
+    }
+};
+
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
