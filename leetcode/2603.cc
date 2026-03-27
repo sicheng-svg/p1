@@ -2189,6 +2189,93 @@ public:
     }
 };
 
+class Solution {
+public:
+    int tribonacci(int n) {
+        if(n == 0) return 0;
+        if(n <= 2) return 1;
+        int a=0, b=1, c=1, d=0;
+        for(int i=3; i<=n; ++i){
+            d = a + b + c;
+            a = b;
+            b = c; 
+            c = d;
+        }
+        return d;
+    }
+};
+
+class Solution {
+public:
+    int waysToStep(int n) {
+        const int tmp = 1000000007;
+        if(n <= 1) return 1;
+        if(n == 2) return 2;
+        // int q = 1, w = 1, e = 2, r = 0;
+        long long q = 1, w = 1, e = 2, r = 0;
+        for(int i=3; i<=n; ++i) {
+            // r = ((q + w) % tmp + e)%tmp;
+            r = (q + w + e) % tmp;
+
+            q = w;
+            w = e;
+            e = r;
+        }
+        return r;
+    }
+    // 对于第0层，不需要考虑，本来就在
+    // 对于第1层，1，一布就可以上来
+    // 对于第2层，2，从0层上来，或者从1层上来
+    // 对于第3层，1+1+2，从0、1、2层都有方式上来
+    // 对于第4层，7，对于第4层，无法直接从0层上来，所以得先到达1/2/3，而这些层数的方式已经知道了，再加上到达第4层的即可
+
+    // 所以dp[i]表示的就是到达第i层的所有可能
+    // 根据上述推导过程，可以得出，dp[i] = dp[i-1] + dp[i-2] + dp[i-3]
+};
+
+class Solution:
+    def numDecodings(self, s: str) -> int:
+        n = len(s)
+        dp = [0]*(n+1)
+        dp[0] = 1
+        dp[1] = 1 if s[0] != '0' else 0
+
+        for i in range(2, n + 1):
+            val = int(s[i-1])
+            prev = int(s[i-2])
+            dp[i] += dp[i-1] if val != 0 else 0
+
+            dp[i] += dp[i-2] if 10<=prev*10 + val<=26 else 0
+        return dp[n]
+
+
+        class Solution:
+    def uniquePaths(self, m: int, n: int) -> int:
+        # dp[i][j]表示走到ij位置时，一共有多少种走法
+        # dp[i][j] = dp[i-1][j] + dp[i][j-1]
+        dp = [[0]*(n+1) for _ in range(m+1)]
+        dp[1][0] = 1
+        for i in range(1, m+1):
+            for j in range(1, n+1):
+                dp[i][j] = dp[i-1][j] + dp[i][j-1]
+        return dp[m][n]
+
+
+class Solution {
+public:
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+        int m = obstacleGrid.size();
+        int n = obstacleGrid[0].size();
+        std::vector<std::vector<int>> dp(m+1, std::vector<int>(n+1, 0));
+        dp[0][1] = 1;
+        for(int i=1; i<=m; ++i){
+            for(int j=1; j<=n; ++j){
+                dp[i][j] = obstacleGrid[i-1][j-1] != 1 ? dp[i-1][j] + dp[i][j-1] : 0;
+            }
+        }
+        return dp[m][n];
+    }
+};
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
