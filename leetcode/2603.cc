@@ -2276,6 +2276,43 @@ public:
         return dp[m][n];
     }
 };
+
+class Solution:
+    def jewelleryValue(self, frame: List[List[int]]) -> int:
+        m, n = len(frame), len(frame[0])
+        dp = [[0]*(n+1) for _ in range(m+1)]
+        for i in range(1, m+1):
+            for j in range(1, n+1):
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1]) + frame[i-1][j-1]
+        return dp[m][n]
+
+class Solution {
+public:
+    int minFallingPathSum(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        std::vector<std::vector<int>> dp(n, std::vector<int>(n));
+        dp[0] = matrix[0];
+        for(int i=1; i<n; ++i){
+            for(int j=0; j<n; ++j){
+                int l = j-1 >= 0 ? dp[i-1][j-1] : std::numeric_limits<int>::max();
+                int m = dp[i-1][j];
+                int r = j+1 < n ? dp[i-1][j+1] : std::numeric_limits<int>::max();
+                dp[i][j] = std::min({l, m ,r}) + matrix[i][j];
+            }
+        }
+        return *std::min_element(dp[n-1].begin(), dp[n-1].end());
+    }
+};
+
+class Solution:
+    def minPathSum(self, grid: List[List[int]]) -> int:
+        m, n = len(grid), len(grid[0])
+        dp = [[float('inf')]*(n+1) for _ in range(m+1)]
+        dp[0][1] = 0
+        for i in range(1, m+1):
+            for j in range(1, n+1):
+                dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i-1][j-1]
+        return dp[m][n]
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
