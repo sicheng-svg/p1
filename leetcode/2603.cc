@@ -2313,6 +2313,50 @@ class Solution:
             for j in range(1, n+1):
                 dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i-1][j-1]
         return dp[m][n]
+class Solution:
+    def calculateMinimumHP(self, dungeon: List[List[int]]) -> int:
+        m, n = len(dungeon), len(dungeon[0])
+        dp = [[float('inf')]*(n+1) for _ in range(m+1)]
+        dp[m-1][n] = dp[m][n-1] = 1
+
+        for i in range(m-1, -1, -1):
+            for j in range(n-1, -1, -1):
+                dp[i][j] = max(min(dp[i][j+1], dp[i+1][j])-dungeon[i][j], 1)
+        return dp[0][0]
+class Solution {
+public:
+    int massage(vector<int>& nums) {
+        int n = nums.size();
+        if(n <= 1){
+            return n == 1 ? nums[0] : 0;
+        }
+        std::vector<int> dp(n);
+        dp[0] = nums[0];
+        dp[1] = std::max(nums[0], nums[1]);
+        for(int i=2; i<n; ++i){
+            dp[i] = std::max(dp[i-1], dp[i-2]+nums[i]);
+        }
+        return dp[n-1];
+    }
+};
+
+class Solution:
+    def robimpl(self, nums: List[int], begin, end:int) -> int:
+        if begin == end:
+            return nums[begin]
+        a = nums[begin]
+        b = max(a, nums[begin+1])
+        for i in range(begin + 2, end+1):
+            tmp = max(b, a + nums[i])
+            a = b
+            b = tmp
+        return b
+
+    def rob(self, nums: List[int]) -> int:
+        n = len(nums)
+        if n == 1:
+            return nums[0]
+        return max(self.robimpl(nums, 0, n-2), self.robimpl(nums, 1, n-1))
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
