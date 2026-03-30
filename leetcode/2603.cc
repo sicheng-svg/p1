@@ -2357,6 +2357,63 @@ class Solution:
         if n == 1:
             return nums[0]
         return max(self.robimpl(nums, 0, n-2), self.robimpl(nums, 1, n-1))
+class Solution:
+    def deleteAndEarn(self, nums: List[int]) -> int:
+        max_val = max(nums)
+        earn = [0] * (max_val + 1)
+        for val in nums:
+            earn[val] += val
+
+        # 打家劫舍
+        n = len(earn)
+        if n == 1:
+            return earn[0]
+        dp = [0] * n
+        dp[0] = earn[0]
+        dp[1] = max(earn[0], earn[1])
+        for i in range(2, n):
+            dp[i] = max(dp[i-1], dp[i-2] + earn[i])
+        return dp[n-1]
+
+class Solution {
+public:
+    int minCost(vector<vector<int>>& costs) {
+        int n = costs.size();
+        std::vector<std::vector<int>> dp(n+1, std::vector<int>(3, 0));
+        for(int i=1; i<=n; ++i){
+            dp[i][0] = std::min(dp[i-1][1], dp[i-1][2]) + costs[i-1][0];
+            dp[i][1] = std::min(dp[i-1][0], dp[i-1][2]) + costs[i-1][1];
+            dp[i][2] = std::min(dp[i-1][0], dp[i-1][1]) + costs[i-1][2];
+        }
+        return *std::min_element(dp[n].begin(), dp[n].end());
+    }
+};
+
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        n = len(prices)
+        dp = [[0]*3 for _ in range (n)]
+        dp[0][0], dp[0][1],dp[0][2] = 0, -prices[0], 0
+        for i in range(1, n):
+            dp[i][0] = max(dp[i-1][0], dp[i-1][2])
+            dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i])
+            dp[i][2] = dp[i-1][1] + prices[i]
+        return max(dp[n-1][0], dp[n-1][2])
+
+        class Solution {
+public:
+    int maxProfit(vector<int>& prices, int fee) {
+        int n = prices.size();
+        std::vector<std::vector<int>> dp(n, std::vector<int>(2));
+        dp[0][0] = 0;
+        dp[0][1] = -prices[0]-fee;
+        for(int i=1; i<n; ++i){
+            dp[i][0] = std::max(dp[i-1][0], dp[i-1][1] + prices[i]);
+            dp[i][1] = std::max(dp[i-1][1], dp[i-1][0]-prices[i]-fee);
+        }
+        return dp[n-1][0];
+    }
+};
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
