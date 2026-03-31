@@ -2414,6 +2414,57 @@ public:
         return dp[n-1][0];
     }
 };
+
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        buy1, sell1 = float('-inf'), 0
+        buy2, sell2 = float('-inf'), 0
+        for p in prices:
+            buy1 = max(buy1, -p)
+            sell1 = max(sell1, buy1 + p)
+            buy2 = max(buy2, sell1-p)
+            sell2 = max(sell2, buy2+p)
+        return sell2
+class Solution {
+public:
+    int maxProfit(int k, vector<int>& prices) {
+        std::vector<int> buy(k, std::numeric_limits<int>::min());
+        std::vector<int> sell(k, 0);
+        for(int p : prices){
+            for(int i=0; i<k;++i){
+                buy[i] = std::max(buy[i], (i > 0 ? sell[i-1] : 0) - p);
+                sell[i] = std::max(sell[i], buy[i] + p);
+            }
+        }
+        return sell[k-1];
+    }
+};
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums){
+        int n = nums.size();
+        std::vector<int> dp(n);
+        dp[0] = nums[0];
+        for(int i=1; i<n; ++i){
+            dp[i] = std::max(dp[i-1], 0) + nums[i];
+        }
+        return *std::max_element(dp.begin(), dp.end());
+    }
+};
+class Solution:
+    def maxSubarraySumCircular(self, nums: List[int]) -> int:
+        total = 0
+        maxS, curMax = nums[0], 0 # 最大子数组和、包含当前元素的最大子数组和
+        minS, curMin = nums[0], 0 # 最小子数组和、包含当前元素的最小子数组和
+        for i in nums:
+            curMax = max(curMax, 0) + i
+            maxS = max(maxS, curMax)
+            curMin = min(curMin, 0) + i
+            minS = min(minS, curMin)
+            total += i
+        if minS == total:
+            return maxS
+        return max(maxS, total-minS)
 int main(){
     LRUCache cache(2);
     // cache.put(1, 1);
