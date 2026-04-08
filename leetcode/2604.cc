@@ -55,3 +55,63 @@ public:
         std::sort(nums.begin() + i + 1, nums.end());
     }
 };
+
+class Solution:
+    def findDuplicate(self, nums: List[int]) -> int:
+        slow, fast = nums[0], nums[nums[0]]
+        while slow != fast:
+            slow = nums[slow]
+            fast = nums[nums[fast]]
+        slow = 0
+        while slow != fast:
+            slow = nums[slow]
+            fast = nums[fast]
+        return slow
+
+class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        # dp[i]表示以i结尾的最大连续子数组的和
+        # dp[i] = max(dp[i-1]+nums[i], nums[i])
+        cur_sum = max_sum = nums[0]
+        for num in nums[1:]:
+            cur_sum = max(cur_sum+num, num)
+            max_sum = max(max_sum, cur_sum)
+        return max_sum
+
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals.sort()
+        ans = []
+        for cur in intervals:
+            if ans and ans[-1][1] >= cur[0]:
+                ans[-1][1] = max(ans[-1][1], cur[1])
+            else:
+                ans.append(cur)
+        return ans
+
+        class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        int n = nums.size();
+        k %= n;
+        std::reverse(nums.begin(), nums.end());
+        std::reverse(nums.begin(), nums.begin() + k);
+        std::reverse(nums.begin() + k, nums.end());
+    }
+};
+
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+        int size = nums.size();
+        std::vector<int> result(size, 1);
+
+        for(int i=1; i<size; i++) result[i] = result[i-1] * nums[i-1];
+        int tmp = 1;
+        for(int i = size - 2; i>=0; i--) {
+            tmp *= nums[i+1];
+            result[i] *= tmp;
+        }
+        return result;
+    }
+};
