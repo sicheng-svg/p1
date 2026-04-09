@@ -115,3 +115,43 @@ public:
         return result;
     }
 };
+
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+        // 借助前缀积 和 后缀积 解决
+        // 前缀积 [0, i)位置的积
+        // 后缀积 [i+1, end]
+        int n = nums.size();
+        std::vector<int> ans(n, 1);
+        // 前缀积
+        for(int i=1; i<n; ++i){
+            ans[i] = ans[i-1]*nums[i-1];
+        }
+
+        // 后缀积
+        int suffix = 1;
+        for(int i=n-2; i>=0; --i){
+            suffix *= nums[i+1];
+            ans[i] *= suffix;
+        }
+        return ans;
+    }
+};
+
+class Solution:
+    def firstMissingPositive(self, nums: List[int]) -> int:
+        n = len(nums)
+        for i in range(n):
+            if nums[i] <= 0:
+                nums[i] = n + 1
+
+        for i in range(n):
+            num = abs(nums[i])
+            if num <= n:
+                nums[num-1] = -abs(nums[num-1])
+
+        for i in range(n):
+            if nums[i] > 0:
+                return i+1
+        return n+1  
