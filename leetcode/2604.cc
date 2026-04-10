@@ -155,3 +155,45 @@ class Solution:
             if nums[i] > 0:
                 return i+1
         return n+1  
+    
+        class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        int m = matrix.size(), n = matrix[0].size();
+        bool isrow = false, iscol = false;
+        // 判断第一行和第一列是否含0
+        for(int i=0; i<m; ++i){
+            if(matrix[i][0] == 0) iscol = true;
+        }
+        for(int j=0; j<n; ++j){
+            if(matrix[0][j] == 0) isrow = true;
+        }
+
+        // 从中间开始，进行标记
+        for(int i=1; i<m; ++i){
+            for(int j=1; j<n; ++j){
+                if(matrix[i][j] == 0) {
+                    matrix[0][j] = 0;
+                    matrix[i][0] = 0;
+                }
+            }
+        } 
+
+        // 将标记的位置全部变成0
+        for(int i=1; i<m; ++i){
+            for(int j=1; j<n; ++j){
+                if(matrix[0][j] == 0 || matrix[i][0] == 0){
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+
+        // 最后判断第一行和第一列是否含0，如果有则变0
+        if(isrow)
+            for(int j=0; j<n; ++j)
+                matrix[0][j] = 0;
+        if(iscol)
+            for(int i=0; i<m; ++i)
+                matrix[i][0] = 0;
+    }
+};
