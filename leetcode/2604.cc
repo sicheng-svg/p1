@@ -197,3 +197,219 @@ public:
                 matrix[i][0] = 0;
     }
 };
+
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        std::vector<int> ans;
+        std::stack<TreeNode*> stk;
+        TreeNode* cur = root;
+
+        while(cur || !stk.empty()){
+            while(cur){
+                stk.push(cur);
+                cur = cur->left;
+            }
+
+            cur = stk.top(); stk.pop();
+            ans.push_back(cur->val);
+            cur = cur->right;
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    // 广度优先遍历
+    int maxDepth(TreeNode* root) {
+        if(root == nullptr) return 0;
+        std::queue<TreeNode*> floor;
+        int ans = 0;
+        floor.push(root);
+        while(!floor.empty()){
+            int sz = floor.size();
+            while(sz--){
+                TreeNode* head = floor.front();floor.pop();
+                if(head->left)
+                    floor.push(head->left);
+                if(head->right)
+                    floor.push(head->right);
+            }
+            ans++;
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if(root==nullptr) return nullptr;
+        TreeNode* cur = root->left;
+        root->left = root->right;
+        root->right = cur;
+        invertTree(root->left);
+        invertTree(root->right);
+        return root;
+    }
+};
+
+class Solution:
+    def isSymmetric(self, root: Optional[TreeNode]) -> bool:
+        q = deque([(root.left, root.right)])
+        while q:
+            l, r = q.popleft()
+            if not l and not r: continue
+            if not l or not r: return False
+            if l.val != r.val: return False
+
+            q.append((l.left, r.right))
+            q.append((l.right, r.left))
+        return True
+
+
+    # 递归
+    def _isSymmetric(self, root: Optional[TreeNode]) -> bool:
+        def check(left, right: Optional[TreeNode]) -> bool:
+            if not left and not right: return True
+            if not left  or not right: return False
+            return left.val == right.val and check(left.left, right.right) and check(left.right, right.left)
+        return check(root.left, root.right)
+
+        class Solution {
+public:
+    int ans = 0;
+    int depth(TreeNode* node){
+        if(node == nullptr) return 0;
+        int l = depth(node->left);
+        int r = depth(node->right);
+        ans = std::max(l+r, ans);
+        return std::max(l, r) + 1;
+    }
+    int diameterOfBinaryTree(TreeNode* root) {
+        depth(root);
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        if(root == nullptr) return {};
+       std::vector<std::vector<int>> ans;
+       std::queue<TreeNode*> q;
+       q.push(root);
+       while(!q.empty()){
+            int sz = q.size();
+            std::vector<int> tmp;
+            while(sz--){
+                auto top = q.front(); q.pop();
+                tmp.push_back(top->val);
+                if(top->left) q.push(top->left);
+                if(top->right) q.push(top->right);
+            }
+            ans.push_back(tmp);
+       }
+       return ans;
+    }
+};
+
+class Solution:
+    def sortedArrayToBST(self, nums: List[int]) -> Optional[TreeNode]:
+        def build(nums, left, right):
+            if left > right:
+                return None
+            mid = (left+right)//2
+            node = TreeNode(nums[mid])
+            node.left = build(nums, left, mid-1)
+            node.right = build(nums, mid+1, right)
+            return node
+        return build(nums, 0, len(nums)-1)
+
+        class Solution {
+public:
+    bool check(TreeNode* node, long lo, long hi){
+        if(node == nullptr) return true;
+        if(node->val <= lo || node->val >= hi) return false;
+        return check(node->left, lo, node->val) && check(node->right, node->val, hi);
+    }
+    bool isValidBST(TreeNode* root) {
+        return check(root, LONG_MIN, LONG_MAX);
+    }
+};
+
+class Solution {
+public:
+    int kthSmallest(TreeNode* root, int k) {
+        std::stack<TreeNode*> stk;
+        TreeNode* cur = root;
+
+        while(cur || !stk.empty()){
+            // 走到最左节点
+            while(cur){
+                stk.push(cur);
+                cur = cur->left;
+            }
+            // 处理根
+            cur = stk.top(); stk.pop();
+            if(--k == 0) return cur->val;
+            cur = cur->right; // 走右子树的左节点
+        }
+        return -1;
+    }
+
+    std::vector<int> nums;
+    void dfs(TreeNode* node){
+        if(node == nullptr) return ;
+        dfs(node->left);
+        nums.push_back(node->val);
+        dfs(node->right);
+    }
+    int _kthSmallest(TreeNode* root, int k) {
+        dfs(root);
+        return *(nums.begin()+k-1);
+    }
+};
+
+
+class Solution {
+public:
+    vector<int> rightSideView(TreeNode* root) {
+        std::queue<TreeNode*> q;
+        std::vector<int> ans;
+        if(root == nullptr) return ans;
+        q.push(root);
+        while(!q.empty()){
+            int sz = q.size();
+
+            while(sz--){
+                auto top = q.front(); q.pop();
+                if(top->left)
+                    q.push(top->left);
+                if(top->right)
+                    q.push(top->right);
+                if(sz == 0){
+                    ans.push_back(top->val);
+                }
+            }
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    void dfs(TreeNode* root, int depth, std::vector<int>& ans){
+        if(root == nullptr) return;
+        if(depth == static_cast<int>(ans.size())) ans.push_back(root->val);
+        dfs(root->right, depth+1, ans);
+        dfs(root->left, depth+1, ans);
+    }
+
+    vector<int> rightSideView(TreeNode* root) {
+        std::vector<int> ans;
+        dfs(root, 0, ans);
+        return ans;
+    }
+};
