@@ -413,3 +413,78 @@ public:
         return ans;
     }
 };
+public:
+    void dfs(TreeNode* root, TreeNode*& prev){
+        if(root == nullptr) return;
+        dfs(root->right, prev);
+        dfs(root->left, prev);
+        root->right = prev;
+        root->left = nullptr;
+        prev = root;
+    }
+    void flatten(TreeNode* root) {
+        TreeNode* prev = nullptr;
+        dfs(root, prev);
+    }
+};
+
+class Solution {
+public:
+    TreeNode* build(std::vector<int>& pre, std::unordered_map<int, int>& inMap, 
+    int preLeft, 
+    int preRight, 
+    int inLeft, 
+    int inRight){
+        // 前序数组的第一个就是当前子树的根
+        if(preLeft > preRight) return nullptr;
+        int rootVal = pre[preLeft];
+        int idx = inMap[rootVal];
+        int leftSize = idx - inLeft; // 在中序数组中，查看根左边有多少个
+
+        // 构造节点
+        TreeNode* root = new TreeNode(rootVal);
+        root->left = build(pre, inMap, preLeft + 1, preLeft + leftSize, inLeft, idx - 1);
+        root->right = build(pre, inMap, preLeft + leftSize + 1, preRight, idx + 1, inRight);
+        return root;
+    }
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        std::unordered_map<int, int> inMap;
+        for(int i=0; i<inorder.size(); ++i) inMap[inorder[i]] = i;
+
+        return build(preorder, inMap, 0, preorder.size() - 1, 0, inorder.size() - 1);
+    }
+};
+
+class Solution {
+public:
+    std::unordered_map<long long, int>prefixSum;
+    int dfs(TreeNode* root, long long curSum, int target){
+        if(!root) return 0;
+        curSum += root->val;
+        int count = prefixSum[curSum-target];
+
+        prefixSum[curSum]++;
+        count += dfs(root->left, curSum, target);
+        count += dfs(root->right, curSum, target);
+        // 完成当前节点，回到上一个节点时，需要将该节点的前缀和删除
+        prefixSum[curSum]--;
+        return count;
+    }
+
+    int pathSum(TreeNode* root, int targetSum) {
+        prefixSum[0] = 1;
+        return dfs(root, 0, targetSum);
+    }
+};
+
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        if not root or root == p or root == q:
+            return root
+        
+        left = self.lowestCommonAncestor(root.left, p, q)
+        right = self.lowestCommonAncestor(root.right, p, q)
+        
+        if left and right:
+            return root
+        return left if left else right
