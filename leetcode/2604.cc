@@ -488,3 +488,221 @@ class Solution:
         if left and right:
             return root
         return left if left else right
+
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+        /* 1. 将wordlist转换为哈希表，方便后续O(1)查找 */
+        std::unordered_set<std::string> wordSet(wordList.begin(), wordList.end());
+
+        /* 如果目标字符串不在wordset中，这不可能完成转换*/
+        if(wordSet.count(endWord) == 0) return 0;
+
+        /* 2. 隐式图，依次将beginWord 中每个位置的元素进行变换，查找变换后的字符是否在set中出现*/
+        std::queue<std::string> q;
+        const std::string a2z = "abcdefghijklmnopqrstuvwxyz";
+        int level = 1; // 起始单词也算一个
+        q.push(beginWord);
+        while(!q.empty()){
+            int sz = q.size();
+            while(sz--){
+                std::string word = q.front(); q.pop();
+                if(word == endWord) return level;
+
+                /* 3.依次将word的每一位都进行枚举a~z*/
+                for(int i=0; i<word.size(); ++i){
+                    char origin = word[i];
+                    for(char ch: a2z){
+                        if(ch == origin) continue; // 枚举字符与原始字符一致，不需要继续走
+                        word[i] = ch;
+                        if(wordSet.count(word)) {
+                            q.push(word);
+                            wordSet.erase(word);
+                        }
+                    }
+                    word[i] = origin; // 恢复当前字符，枚举下一个位置
+                }
+            }
+            ++level;
+        }
+        return 0;
+    }
+};
+
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        /* 1. 使用邻接表方式建图， 同时统计每个顶点的入度*/
+        std::vector<std::vector<int>> adj(numCourses);
+        std::vector<int> inDegree(numCourses, 0);
+        for(const auto& edge: prerequisites){
+            adj[edge[1]].push_back(edge[0]);
+            ++inDegree[edge[0]];
+        }
+
+        /* 2. 所有入度为0的点进队列*/
+        std::queue<int> q;
+        for(int i=0; i<inDegree.size(); ++i){
+            if(inDegree[i] == 0) {
+                q.push(i);
+            }
+        }
+
+        /* 3. 开始学习，依次消费入度为0的顶点，随后让其的邻居入度-1
+        如果在这个过程中入度变为0，则要插入到队列中*/
+        /* tip: 维护一个已经学习过的数组，如果发现学习过的数量已经大于课程数量，则return false*/
+        int hasLearned = 0;
+        while(!q.empty()){
+            int sz = q.size();
+            hasLearned += sz;
+            while(sz--){
+                /* 4. 本轮中全是入度为0的顶点，在邻接表中找到对应的邻居列表，将其中所有的入度-1
+                如果入度变为0，则要加入到队列中*/
+                int vertex = q.front(); q.pop();
+                for(int& neighbor: adj[vertex]){
+                    inDegree[neighbor]--;
+                    if(inDegree[neighbor] == 0) q.push(neighbor);
+                }
+            }
+        }
+        return hasLearned == numCourses;
+    }
+};
+
+class Solution {
+public:
+    int maxAreaOfIsland(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        int maxArea = 0;
+
+        for(int i=0; i<m; ++i){
+            for(int j=0; j<n; ++j){
+                if(grid[i][j] == 1){
+                    int area = dfs(grid, i, j, m, n);   
+                    maxArea = std::max(maxArea, area);            
+                }
+            }
+        }
+        return maxArea;
+    }
+    int dfs(std::vector<std::vector<int>>& grid, int i, int j, int m, int n){
+        if(i<0 || i>=m || j<0 || j>=n || grid[i][j] != 1) return 0;
+
+        grid[i][j] = 0; // 标记当前为已访问
+        return 1 + dfs(grid, i+1, j, m, n) + 
+        dfs(grid, i-1, j, m, n) + 
+        dfs(grid, i, j-1, m, n) +
+        dfs(grid, i, j+1, m, n);
+    }
+};
+
+class Solution {
+public:
+    int numIslands(vector<vector<char>>& grid) {
+        int m = grid.size();
+        int n = grid[0].size();
+        int count = 0;
+
+        for(int i=0; i<m; ++i){
+            for(int j=0; j<n; ++j){
+                if(grid[i][j] == '1'){
+                    // 是陆地，开始dfs，将附近所有的陆地都遍历一遍
+                    bfs(grid, i, j, m, n);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    void bfs(std::vector<std::vector<char>>& grid, int i, int j, int m, int n){
+        std::queue<std::pair<int, int>> q;
+        q.push({i, j});
+        grid[i][j] = '0';
+
+        int dirs[4][4] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        while(!q.empty()){
+            auto [a, b] = q.front();q.pop();
+            for(int di=0; di<4; ++di){
+                int ni = a + dirs[di][0];
+                int nb = b + dirs[di][1];
+                if(ni >= 0 && ni < m && nb >= 0 && nb < n && grid[ni][nb] == '1'){
+                    grid[ni][nb] = '0';
+                    q.push({ni, nb});
+                }
+            }
+        }
+    }
+
+    int _numIslands(vector<vector<char>>& grid) {
+        int m = grid.size();
+        int n = grid[0].size();
+        int count = 0;
+
+        for(int i=0; i<m; ++i){
+            for(int j=0; j<n; ++j){
+                if(grid[i][j] == '1'){
+                    // 是陆地，开始dfs，将附近所有的陆地都遍历一遍
+                    dfs(grid, i, j, m, n);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    void dfs(std::vector<std::vector<char>>& grid, int i, int j, int m, int n) {
+        if(i<0 || i>=m || j<0 || j>=n || grid[i][j] != '1'){
+            return;
+        }
+        // 标记当前为已访问
+        grid[i][j] = '0';
+        // 递归访问附近的所有陆地
+        dfs(grid, i+1, j, m, n);
+        dfs(grid, i-1, j, m, n);
+        dfs(grid, i, j-1, m, n);
+        dfs(grid, i, j+1, m, n);
+    }
+};
+
+class Solution {
+public:
+    int orangesRotting(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        int freshCount = 0, mins = 0;
+        std::queue<std::pair<int, int>> q;
+        /* 1. 找到所有腐烂的橘子加入到队列中，同时进行bfs，并且记录新鲜橘子的个数*/
+        for(int i=0; i<m; ++i){
+            for(int j=0; j<n; ++j){
+                if(grid[i][j] == 2){
+                    q.push({i,j});
+                }else if(grid[i][j] == 1){
+                    freshCount++;
+                }
+            }
+        }
+        /* 如果刚开始就没有新鲜橘子，则不需要传染*/
+        if(freshCount == 0) return 0;
+
+        /* 2. 所有腐烂的橘子同时开始进行传染 */
+        int dirs[4][2] = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+        while(!q.empty()){
+            /* 3. 一次性将本次所有的腐烂橘子都执行一遍传染*/
+            int sz = q.size();
+            int infected = false;
+            while(sz--){
+                auto [a, b] = q.front(); q.pop();
+                for(auto dir: dirs){
+                    int ni = a + dir[0];
+                    int nj = b + dir[1];
+                    if(ni >= 0 && ni < m && nj >= 0 && nj < n && grid[ni][nj] == 1){
+                        grid[ni][nj] = 2;
+                        q.push({ni, nj});
+                        freshCount--;
+                        infected = true;
+                    }
+                }               
+            }
+            if(infected) mins++;
+        }  
+        return freshCount == 0 ? mins : -1;
+    }
+};:wchar_t：w:wchar_t
