@@ -706,3 +706,81 @@ public:
         return freshCount == 0 ? mins : -1;
     }
 };:wchar_t：w:wchar_t
+
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        # 1. 使用邻接表建图，并统计每个顶点的入度
+        adj = defaultdict(list)
+        inDegree = [0] * numCourses
+
+        for a, b in prerequisites:
+            adj[b].append(a)
+            inDegree[a] += 1
+        
+        # 2. 将入度为0的顶点加入到顶点中
+        q = deque( i for i in range(numCourses) if inDegree[i] == 0)
+
+        # 3.开始学习，从入度为0的开始学习，最后要么将所有的课程学完，要么有的课程怎么也学不到。提前返回
+        hasLearned = 0
+        while q:
+            u = q.popleft()
+            hasLearned += 1
+            for v in adj[u]: # 找到课程u的邻居，将其的入度-1，如果入度为0，则添加进队列
+                inDegree[v] -= 1
+                if inDegree[v] == 0:
+                    q.append(v)
+        return hasLearned == numCourses
+
+
+        class Trie {
+public:
+    Trie() :root(new TrieNode){}
+    
+    void insert(string word) {
+        TrieNode* node = root;
+        for(char c: word){
+            int idx = c - 'a'; // 计算当前字符对应的下标
+            if(node->children[idx] == nullptr){
+                node->children[idx] = new TrieNode;
+            }
+            node = node->children[idx]; // 走到当前元素的位置，从这个位置开始找下一个字符
+        }
+        /* word遍历完成后，此时node处于最后一个字符的节点，标记其为end */
+        node->isEnd = true;
+    }
+    
+    bool search(string word) {
+        /* search 则要精准找到word，word最后一个字符对应的节点isend必须为true*/
+        TrieNode* node = findNode(word);
+        return node != nullptr && node->isEnd;
+    }
+    
+    bool startsWith(string prefix) {
+        TrieNode* node = findNode(prefix);
+        return findNode(prefix) != nullptr;
+    }
+private:
+    struct TrieNode {
+        TrieNode* children[26] = {nullptr};  // 默认全部 nullptr
+        bool isEnd = false;
+    };
+    TrieNode* root;
+
+    TrieNode* findNode(const string& s)const {
+        TrieNode* node = root;
+        for(char c: s){
+            int idx = c - 'a';
+            if(node->children[idx] == nullptr) return nullptr; // 当前字符没有下一个节点，但word还没结束
+            node = node->children[idx];
+        }
+        return node;
+    }
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
