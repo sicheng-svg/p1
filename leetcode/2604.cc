@@ -784,3 +784,58 @@ private:
  * bool param_2 = obj->search(word);
  * bool param_3 = obj->startsWith(prefix);
  */
+
+ /**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int maxAns = INT_MIN;
+    int maxGain(TreeNode* node){
+        if(node == nullptr) return 0;
+
+        /* 分别计算当前节点的左路径以及右路径的最大贡献，如果贡献小于0，还不如不要这条路径*/
+        int leftMaxGain = std::max(maxGain(node->left), 0);
+        int rightMaxGain = std::max(maxGain(node->right), 0);
+        /* 计算当前的最大贡献值 */
+        maxAns = std::max(maxAns, node->val + leftMaxGain + rightMaxGain);
+
+        return node->val + std::max(leftMaxGain, rightMaxGain);
+    }
+    int maxPathSum(TreeNode* root) {
+        maxGain(root);
+        return maxAns;
+    }
+};
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def __init__(self):
+        self.max_sum = float('-inf')
+
+    def maxPathSum(self, root: Optional[TreeNode]) -> int:
+        # 该函数用来以当前节点为最高点的最大贡献、以及像父节点返回一个最大的贡献(node.val + right/left)
+        def maxGain(node):
+            if node is None: 
+                return 0
+            leftGain = max(maxGain(node.left), 0)
+            rightGain = max(maxGain(node.right), 0)
+
+            self.max_sum = max(self.max_sum, leftGain + rightGain + node.val)
+
+            return node.val + max(leftGain, rightGain)
+        maxGain(root)
+        return self.max_sum
