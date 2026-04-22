@@ -839,3 +839,33 @@ class Solution:
             return node.val + max(leftGain, rightGain)
         maxGain(root)
         return self.max_sum
+
+        class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        path = []
+        used = [False] * len(nums)
+        
+        def backtrack():
+            # 结束条件
+            if len(path) == len(nums):
+                res.append(path[:]) # 重点：必须做浅拷贝，否则后续回溯会清空 path
+                return
+            
+            for i in range(len(nums)):
+                if used[i]:
+                    continue # 优化剪枝
+                
+                # 做选择
+                path.append(nums[i])
+                used[i] = True
+                
+                # 递归
+                backtrack()
+                
+                # 撤销选择 (回溯)
+                path.pop()
+                used[i] = False
+                
+        backtrack()
+        return res
