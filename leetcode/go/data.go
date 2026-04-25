@@ -281,7 +281,7 @@ func test_type() {
 	fmt.Println(result)
 }
 
-func main() {
+func main2() {
 	// test_string()
 	// arr()
 	// print()
