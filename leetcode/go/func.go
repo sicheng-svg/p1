@@ -10,7 +10,7 @@ func f1() int {
 	return x
 }
 
-func f2() (x int) {
+func ff2() (x int) {
 	defer func() {
 		x++
 	}()
@@ -31,8 +31,8 @@ func f4() (x int) {
 	return 5
 }
 func main3() {
-	fmt.Println(f1()) // 6
-	fmt.Println(f2()) // 5
-	fmt.Println(f3()) // 报错？
-	fmt.Println(f4()) // 8
+	fmt.Println(f1())  // 6
+	fmt.Println(ff2()) // 5
+	fmt.Println(f3())  // 报错？
+	fmt.Println(f4())  // 8
 }

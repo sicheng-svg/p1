@@ -274,7 +274,7 @@ func add(x, y int) int {
 	return x + y
 }
 
-func test_type() {
+func test_type1() {
 	var calc calculation
 	calc = add
 	result := calc(10, 20)

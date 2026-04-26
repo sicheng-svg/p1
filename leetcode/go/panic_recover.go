@@ -20,7 +20,7 @@ func funcB() {
 func funcC() {
 	fmt.Println("func C")
 }
-func main() {
+func main4() {
 	funcA()
 	funcB()
 	funcC()
