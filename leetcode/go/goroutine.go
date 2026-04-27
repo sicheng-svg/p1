@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-var wg sync.WaitGroup
+var wg1 sync.WaitGroup
 
 func hello() {
 	fmt.Println("Hello World")
@@ -50,7 +50,7 @@ func f2(ch chan int) {
 	}
 }
 
-func main() {
+func main11() {
 	ch := make(chan int, 2)
 	ch <- 1
 	ch <- 2
