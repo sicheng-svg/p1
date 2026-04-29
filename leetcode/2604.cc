@@ -869,3 +869,51 @@ class Solution:
                 
         backtrack()
         return res
+
+        func combinationSum(candidates []int, target int) [][]int {
+    ans := [][]int{}
+    path := []int{}
+    sum := 0
+
+    var dfs func(int)
+    dfs = func(start int) {
+        if sum == target{
+            tmp := make([]int, len(path))
+            copy(tmp, path)
+            ans = append(ans, tmp)
+            return
+        }else if sum > target {
+            return
+        }
+
+        for i := start; i < len(candidates); i++ {
+            path = append(path, candidates[i])
+            sum += candidates[i]
+            dfs(i)
+            sum -= candidates[i]
+            path = path[:len(path)-1]
+        }
+    }
+
+    dfs(0)
+    return ans
+}
+
+class Solution:
+    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:
+        ans = []
+        path = []
+
+        def dfs(start: int, remain: int):
+            if remain == 0:
+                ans.append(path[:]) # 拷贝
+                return
+            elif remain < 0:
+                return
+
+            for i in range(start, len(candidates)):
+                path.append(candidates[i])
+                dfs(i, remain - candidates[i])
+                path.pop()
+        dfs(0, target)
+        return ans
