@@ -917,3 +917,185 @@ class Solution:
                 path.pop()
         dfs(0, target)
         return ans
+
+        class Solution {
+public:
+    std::string path;
+    std::vector<std::string> ans;
+    vector<string> generateParenthesis(int n) {
+        dfs(0, 0, n);
+        return ans;
+    }
+
+    void dfs(int left, int right, int n){
+        if (path.size() == 2*n) {
+            ans.push_back(path);
+            return;
+        }
+        if (left < n) {
+            // 还可以选左括号
+            path.push_back('(');
+            dfs(left+1, right, n);
+            path.pop_back();
+        }
+
+        if(right < left) {
+            // 左括号比右括号多，可以选右括号
+            path.push_back(')');
+            dfs(left, right + 1, n);
+            path.pop_back();
+        }
+    }
+};
+
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+        path = []
+        ans = []
+
+        def dfs(left, right):
+            if len(path) == 2*n:
+                ans.append(''.join(path))
+                return
+            if left < n:
+                path.append('(')
+                dfs(left+1, right)
+                path.pop()
+            if right < left:
+                path.append(')')
+                dfs(left, right+1)
+                path.pop()
+            
+        dfs(0, 0)
+        return ans
+
+        func generateParenthesis(n int) []string {
+    ans := []string{}
+    path := make([]byte, 0, 2*n)
+
+    var dfs func(left, right int)
+    dfs = func(left, right int) {
+        if len(path) == 2 * n {
+            ans = append(ans, string(path))
+            return
+        }
+
+        if left < n {
+            path = append(path, '(')
+            dfs(left+1, right)
+            path = path[:len(path)-1]
+        }
+        if right < left {
+            path = append(path, ')')
+            dfs(left, right+1)
+            path = path[:len(path)-1]
+        }
+    }
+
+    dfs(0, 0)
+    return ans
+}
+
+func exist(board [][]byte, word string) bool {
+    m, n := len(board), len(board[0])
+    w_sz := len(word)
+
+    var dfs func(i, j, k int)bool
+    dfs = func(i, j, k int) bool {
+        if k == w_sz {
+            return true
+        }
+        if i < 0 || i >= m || j < 0 || j >= n || board[i][j] != word[k] {
+            return false
+        }
+        tmp := board[i][j]
+        board[i][j] = '#'
+
+        answer := dfs(i+1, j, k + 1) || dfs(i-1, j, k+1) || dfs(i, j+1, k+1) || dfs(i, j-1, k+1)
+        board[i][j] = tmp
+        return answer
+    }
+    for i:=0; i<m; i++{
+        for j:=0; j<n; j++ {
+            if dfs(i, j, 0) {
+                return true
+            }
+        }
+    }
+    return false
+}
+
+class Solution:
+    def exist(self, board: List[List[str]], word: str) -> bool:
+        m, n, w_sz = len(board), len(board[0]), len(word)
+
+        def dfs(i, j, k) -> bool:
+            if k == w_sz:
+                return True
+            if i < 0 or i >= m or j < 0 or j >= n or board[i][j] != word[k]:
+                return False
+            
+            tmp = board[i][j]
+            board[i][j] = '#'
+            answer = dfs(i+1, j, k+1) or dfs(i-1, j, k+1) or dfs(i, j+1, k+1) or dfs(i, j-1, k+1)
+            board[i][j] = tmp
+            return answer
+        for i in range(m):
+            for j in range(n):
+                if dfs(i, j, 0):
+                    return True
+        return False
+
+class Solution {
+public:
+    bool exist(vector<vector<char>>& board, string word) {
+        int m = board.size(), n = board[0].size(), w_sz = word.size();
+        function<bool(int, int, int)> dfs = [&](int i, int j, int k){
+            if(k == w_sz) return true;
+            if(i<0 || i>=m || j<0 || j>=n || board[i][j]!=word[k]) return false;
+            char tmp = board[i][j];
+            board[i][j] = '#';
+            bool answer = dfs(i+1, j, k+1) || dfs(i-1, j, k+1) || dfs(i, j+1, k+1) || dfs(i, j-1, k+1);
+            board[i][j] = tmp;
+            return answer;
+        };
+
+        for(int i=0; i<m; ++i)
+            for(int j=0; j<n; ++j)
+                if(dfs(i, j, 0)) return true;
+        return false;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<string>> partition(string s) {
+        std::vector<std::vector<std::string>> ans;
+        std::vector<std::string> path;
+        int n = s.size();
+
+        auto isPalindrome = [&](int l, int r) ->bool{
+            while(l<r){
+                if(s[l] != s[r]) return false;
+                l++;r--;
+            }
+            return true;
+        };
+
+        std::function<void(int)> dfs = [&](int start){
+            if(start == n){
+                ans.push_back(path);
+                return;
+            }
+            for(int end=start; end<n; ++end){
+                if(isPalindrome(start, end)){
+                    path.push_back(s.substr(start, end-start+1));
+                    dfs(end+1);
+                    path.pop_back();
+                }
+            }
+        }; 
+        dfs(0);
+        return ans;
+    }
+};
