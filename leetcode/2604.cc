@@ -1099,3 +1099,20 @@ public:
         return ans;
     }
 };
+
+func searchMatrix(matrix [][]int, target int) bool {
+    m, n := len(matrix), len(matrix[0])
+    left, right := 0, m*n - 1
+    for left <= right{
+        mid := left + (right - left)/2
+        x := matrix[mid / n][mid % n]
+        if target < x{
+            right = mid - 1
+        }else if target > x{
+            left = mid +1
+        }else{
+            return true
+        }
+    }
+    return false
+}
