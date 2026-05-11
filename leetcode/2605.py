@@ -55,3 +55,33 @@ class Solution:
             for j in range(1, n+1):
                 dp[i][j] = dp[i-1][j] + dp[i][j-1]
         return dp[m][n]
+
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        n = len(s)
+        if n < 2:
+            return s
+        
+        dp = [[False]*n for _ in range(n)]
+        start = 0
+        max_len = 1
+        
+        # 单字符回文
+        for i in range(n):
+            dp[i][i] = True
+        
+        # 填表
+        for j in range(1, n):       # 右边界
+            for i in range(j-1, -1, -1):  # 左边界，从 j-1 到 0
+                if s[i] == s[j]:
+                    if j - i <= 2:
+                        dp[i][j] = True
+                    else:
+                        dp[i][j] = dp[i+1][j-1]
+                # 更新最长回文
+                if dp[i][j] and (j-i+1 > max_len):
+                    max_len = j - i + 1
+                    start = i
+    
+        return s[start:start+max_len]
+        
