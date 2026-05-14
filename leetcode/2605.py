@@ -99,3 +99,20 @@ class Solution:
                 ans += rightMax - height[right]
                 right -= 1
         return ans
+
+class Solution {
+public:
+    bool isGood(vector<int>& nums) {
+        int n =nums.size() - 1;
+        std::vector<int> cnt(n+2, 0);
+        // 统计频次
+        for(int x: nums){
+            if(x<1 || x > n) return false;
+            cnt[x]++;
+        }
+        for(int i=0; i<n; ++i){
+            if(cnt[i] != 1) return false;
+        }
+        return cnt[n] == 2;
+    }
+};
