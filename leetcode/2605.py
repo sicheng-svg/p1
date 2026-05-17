@@ -128,3 +128,21 @@ class Solution:
                 matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
         for row in matrix:
             row.reverse()
+
+class Solution {
+public:
+    bool canReach(vector<int>& arr, int start) {
+        int n = arr.size();
+        std::vector<bool> visited(n, false);
+        std::queue<int> q;
+        q.push(start);
+        while(!q.empty()){
+            int idx = q.front(); q.pop();
+            if(arr[idx] == 0) return true;
+            visited[idx] = true;
+            if(idx - arr[idx] >= 0 && !visited[idx-arr[idx]]) q.push(idx - arr[idx]);
+            if(idx + arr[idx] < n && !visited[idx+arr[idx]]) q.push(idx + arr[idx]);
+        }
+        return false;
+    }
+};
