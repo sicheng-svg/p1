@@ -146,3 +146,40 @@ public:
         return false;
     }
 };
+
+class Solution:
+    def minJumps(self, arr: List[int]) -> int:
+        n = len(arr)
+        if n == 1:
+            return 0
+        
+        # 将相同value的下标存储在一起，方便查找j位置
+        idx = defaultdict(list)
+        for i, v in enumerate(arr):
+            idx[v].append(i)
+        
+        q = deque([0])
+        visited = [False]*n
+        visited[0] = True
+        steps = 0
+
+        while q:
+            for _ in range(len(q)):
+                i = q.popleft()
+                if i == n-1:
+                    return steps
+                
+                # 值相同的邻居
+                for j in idx[arr[i]]:
+                    if not visited[j]:
+                        visited[j] = True
+                        q.append(j)
+                idx[arr[i]].clear()
+
+                # 还可以走到i+1/i-1位置
+                for j in (i-1, i+1):
+                    if 0 <= j and j < n and not visited[j]:
+                        visited[j] = True
+                        q.append(j)
+            steps += 1 # 将一层处理完后， steps++
+        return -1
