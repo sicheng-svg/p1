@@ -183,3 +183,19 @@ class Solution:
                         q.append(j)
             steps += 1 # 将一层处理完后， steps++
         return -1
+class Solution {
+public:
+    void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
+        int i = m-1, j = n-1, tail = m+n-1;
+        while(i>=0 && j>=0){
+            if(nums1[i] > nums2[j]) nums1[tail--] = nums1[i--];
+            else nums1[tail--] = nums2[j--];
+        }
+        while(i>=0){
+            nums1[tail--] = nums1[i--];
+        }
+        while(j>=0){
+            nums1[tail--] = nums2[j--];
+        }
+    }
+};
