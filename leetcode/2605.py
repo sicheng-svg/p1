@@ -215,3 +215,38 @@ public:
         return ans;
     }
 };
+
+class Solution {
+public:
+    int longestCommonPrefix(vector<int>& arr1, vector<int>& arr2) {
+        struct Node { Node* childern[10] = {}; };
+        Node* root = new Node();
+
+        // 1. 将arr1以前缀的方式存储在trie中
+        for(int x : arr1){
+            std::string s = std::to_string(x);
+            Node* cur = root;
+            for(char c : s){
+                int i = c - '0';
+                if(!cur->childern[i]) cur->childern[i] = new Node();
+                cur = cur->childern[i];
+            }
+        }
+
+        // 2. 遍历arr2的每一个数，找到走的最深的位置，就是所有数对中的最长前缀
+        int ans = 0;
+        for(int y : arr2){
+            std::string s = std::to_string(y);
+            int tmp = 0;
+            Node* cur = root;
+            for(char c : s){
+                int i = c - '0';
+                if(!cur->childern[i]) break;
+                cur = cur->childern[i];
+                tmp++;
+            }
+            ans = std::max(ans, tmp);
+        }
+        return ans;
+    }
+};
