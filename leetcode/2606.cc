@@ -1,4 +1,5 @@
 #include <vector>
+#include <unordered_map>
 #include <algorithm>
 #include <climits>
 
@@ -121,5 +122,127 @@ public:
             maxProfit = std::max(maxProfit, p-minPrice);
         }
         return maxProfit;
+    }
+};
+
+class RandomizedSet {
+public:
+    RandomizedSet() {}
+    
+    bool insert(int val) {
+        if(map.count(val)) return false;
+        map[val] = arr.size(); // 存储值和下标的映射关系
+        arr.push_back(val);
+        return true;
+    }
+    
+    bool remove(int val) {
+        if(map.count(val) == 0) return false;
+        // 将待删除的下标用back覆盖，随后删除back即可
+        int i = map[val]; // 获取待删除元素的下标
+        int ready = arr.back(); // 记录末尾元素
+        arr[i] = ready; // 覆盖i位置的元素
+        map[ready] = i; // 更新映射关系
+        
+        arr.pop_back();
+        map.erase(val);
+        return true;
+    }
+    
+    int getRandom() {
+        return arr[rand() % arr.size()];
+    }
+private:
+    std::vector<int> arr;
+    std::unordered_map<int, int> map;
+};
+
+/**
+ * Your RandomizedSet object will be instantiated and called as such:
+ * RandomizedSet* obj = new RandomizedSet();
+ * bool param_1 = obj->insert(val);
+ * bool param_2 = obj->remove(val);
+ * int param_3 = obj->getRandom();
+ */
+
+class Solution9 {
+public:
+    std::vector<int> productExceptSelf(std::vector<int>& nums) {
+        int n = nums.size();
+        std::vector<int> ans(n, 1);
+        // 借助前缀积 和 后缀积实现。因为i位置就是除自身外，左右数组的乘积
+        // 第一遍，获取左积
+        for(int i=1; i<n; ++i){
+            ans[i] = ans[i-1] * nums[i-1];
+        }
+        // 第二遍，获取右积
+        int right = 1;
+        for(int i=n-1; i>=0; --i){
+            ans[i] *= right;
+            right *= nums[i];
+        }
+        return ans;
+    }
+};
+
+class Solution10 {
+public:
+    int canCompleteCircuit(std::vector<int>& gas, std::vector<int>& cost) {
+        int n = gas.size(), tank = 0, total = 0;
+        int start = 0;
+        for(int i=0;i <n; ++i){
+            int diff = gas[i] - cost[i];
+            total += diff;
+            tank += diff;
+            if (tank < 0){
+                start = i + 1;
+                tank = 0;
+            }
+        }
+        return total >= 0 ? start : -1;
+    }
+};
+
+class Solution11 {
+public:
+    int candy(std::vector<int>& ratings) {
+        int n = ratings.size();
+        std::vector<int> count1(n, 1);
+        std::vector<int> count2(n, 1);
+        // 1.从左往右，只要比左边评分高，就+1
+        for(int i=1; i<n; ++i){
+            if(ratings[i] > ratings[i-1]) count1[i] = count1[i-1] + 1;
+        }
+        // 2.从右往左，只要比右边评分高，就+1
+        for(int i=n-2; i>=0; --i){
+            if(ratings[i] > ratings[i+1]) count2[i] = count2[i+1] + 1;
+        }
+        int ans = 0;
+        for(int i=0; i<n; ++i){
+            ans += std::max(count1[i], count2[i]);
+        }
+        return ans;
+    }
+};
+
+class Solution12 {
+public:
+    int trap(std::vector<int>& height) {
+        int left = 0, right = height.size() - 1;
+        int leftMax = 0, rightMax = 0;
+        int ans = 0;
+        while(left < right){
+            if(height[left] < height[right]){
+                // 右边柱子高，则该位置的水位取决于左边
+                leftMax = std::max(leftMax, height[left]);
+                ans += leftMax - height[left];
+                left++;
+            }else{
+                rightMax = std::max(rightMax, height[right]);
+                ans += rightMax - height[right];
+                right--;
+            }
+        }
+        return ans;
     }
 };
