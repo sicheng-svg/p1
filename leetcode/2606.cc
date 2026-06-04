@@ -1,5 +1,7 @@
+#include <string>
 #include <vector>
 #include <unordered_map>
+#include <stack>
 #include <algorithm>
 #include <climits>
 
@@ -244,5 +246,195 @@ public:
             }
         }
         return ans;
+    }
+};
+
+class Solution12 {
+    std::unordered_map<char, int> dict{
+        {'I', 1},
+        {'V', 5},
+        {'X', 10},
+        {'L', 50},
+        {'C', 100},
+        {'D', 500},
+        {'M', 1000}
+    };
+public:
+    int romanToInt(std::string s) {
+        int ans = 0;
+        for(int i=0; i<s.size(); ++i){
+            if(i + 1 < s.size() && dict[s[i]] < dict[s[i+1]]){
+                ans -= dict[s[i]];
+            }else{
+                ans += dict[s[i]];
+            }
+        }
+        return ans;
+    }
+};
+
+class Solution13 {
+public:
+    std::string intToRoman(int num) {
+        const int val[]  = {1000,900,500,400,100,90,50,40,10,9,5,4,1};
+        const std::string sym[] = {"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};
+        std::string ans;
+        for (int i = 0; i < 13; ++i) {
+            while (num >= val[i]) {
+                ans += sym[i];
+                num -= val[i];
+            }
+        }
+        return ans;
+    }
+};
+
+class Solution14 {
+public:
+    int lengthOfLastWord(std::string s) {
+        int idx = s.size() - 1;
+        // 1. 绕开后置空格
+        while(s[idx] == ' ') idx--;
+        // 2. 开始记录单词长度
+        int ans = 0;
+        while(idx >= 0 && s[idx] != ' '){
+            idx--;
+            ans++;
+        }
+        return ans;
+    }
+};
+
+class Solution15 {
+public:
+    std::string longestCommonPrefix(std::vector<std::string>& strs) {
+        std::string prefix;
+        // 纵向比较
+        for(int i=0; i<strs[0].size(); ++i){
+            char c = strs[0][i];
+            for(int j=1; j<strs.size(); ++j){
+                if(i >= strs[j].size() || strs[j][i] != c)
+                    return strs[0].substr(0, i);
+            }
+        }
+        return strs[0];
+    }
+};
+
+class Solution16 {
+public:
+    std::string reverseWords(std::string s) {
+        std::stack<std::string> st;
+        int i = 0, n = s.size();
+        while (i < n) {
+            while (i < n && s[i] == ' ') i++;        // 跳过空格
+            if (i >= n) break;
+            int start = i;
+            while (i < n && s[i] != ' ') i++;          // 找单词结尾
+            st.push(s.substr(start, i - start));
+        }
+        std::string ans;
+        while (!st.empty()) {
+            ans += st.top(); st.pop();
+            if (!st.empty()) ans += ' ';               // 词间才加空格
+        }
+        return ans;
+    }
+};
+
+class Solution17 {
+public:
+    std::string convert(std::string s, int numRows) {
+        int n = s.size();
+        if(numRows == 1) return s;
+        std::vector<std::string> rows(std::min(n, numRows));
+        int row = 0, dir = -1;
+        for(char ch: s){
+            rows[row] += ch;
+            if(row == 0 || row == numRows - 1) dir = -dir;
+            row += dir;
+        }
+        std::string ans;
+        for(auto row: rows){
+            ans += row;
+        }
+        return ans;
+    }
+};
+
+class Solution18 {
+public:
+    int strStr(std::string haystack, std::string needle) {
+        int n = haystack.size(), m = needle.size();
+        for(int i=0; i + m <= n; ++i){
+            int j = 0;
+            while(j < m && haystack[i + j] == needle[j]) j++;
+            if(j == m) return i;
+        }
+        return -1;
+    }
+};
+
+class Solution19 {
+public:
+    std::vector<std::string> fullJustify(std::vector<std::string>& words, int maxWidth) {
+        std::vector<std::string> res;
+        int n = words.size(), i = 0;
+        while (i < n) {
+            // 1. 贪心确定本行 [i, j) 放哪些词
+            int j = i, lineLen = 0;
+            while (j < n && lineLen + words[j].size() + (j - i) <= maxWidth) {
+                lineLen += words[j].size();
+                ++j;
+            }
+            int cnt = j - i;              // 本行词数
+            int gaps = cnt - 1;
+            int spaces = maxWidth - lineLen;  // 要填的总空格
+
+            std::string line;
+            if (j == n || cnt == 1) {
+                // 情况 A：最后一行 / 单词行 —— 左对齐
+                for (int k = i; k < j; ++k) {
+                    line += words[k];
+                    if (k != j - 1) line += ' ';
+                }
+                line += std::string(maxWidth - line.size(), ' ');  // 右补空格
+            } else {
+                // 情况 B：两端对齐
+                int base = spaces / gaps, extra = spaces % gaps;
+                for (int k = i; k < j; ++k) {
+                    line += words[k];
+                    if (k != j - 1) {
+                        int sp = base + (k - i < extra ? 1 : 0);  // 左边间隙多分
+                        line += std::string(sp, ' ');
+                    }
+                }
+            }
+            res.push_back(line);
+            i = j;
+        }
+        return res;
+    }
+};
+
+class Solution20 {
+public:
+    int totalWaviness(int num1, int num2) {
+        auto getWaviness = [](int x) -> int{
+            std::string s = std::to_string(x);
+            int waviness = 0;
+            for(size_t i=1; i<s.size()-1; ++i){
+                bool isPeak = s[i] > s[i-1] && s[i] > s[i+1];
+                bool isValley = s[i] < s[i-1] && s[i] < s[i+1];
+                if(isPeak || isValley) waviness++;
+            }
+            return waviness;
+        };
+
+        int total = 0;
+        for(int i=num1; i<=num2; ++i){
+            total += getWaviness(i);
+        }
+        return total;
     }
 };
