@@ -4,6 +4,7 @@
 #include <stack>
 #include <algorithm>
 #include <climits>
+#include <cstring>
 
 class Solution1 {
 public:
@@ -436,5 +437,57 @@ public:
             total += getWaviness(i);
         }
         return total;
+    }
+};
+
+class Solution21 {
+public:
+    long long totalWaviness(long long num1, long long num2) {
+        return f(num2) - f(num1 - 1);
+    }
+private:
+    std::string s;
+    // memo[i][pre2][pre1] -> {cnt, sum}
+    std::pair<long long,long long> memo[20][11][11];
+    bool vis[20][11][11];
+
+    long long f(long long x) {
+        if (x < 0) return 0;
+        s = std::to_string(x);
+        memset(vis, 0, sizeof(vis));
+        return dfs(0, 10, 10, true, false).second;
+    }
+
+    // 返回 {该路径下数字个数, 波动值总和}
+    std::pair<long long,long long> dfs(int i, int pre2, int pre1, bool isLimit, bool isNum) {
+        if (i == s.size())
+            return {isNum ? 1 : 0, 0};
+        if (!isLimit && isNum && vis[i][pre2][pre1])
+            return memo[i][pre2][pre1];
+
+        long long cnt = 0, sum = 0;
+        // 跳过当前位（前导零，还没开始填数字）
+        if (!isNum) {
+            auto [c, s2] = dfs(i + 1, 10, 10, false, false);
+            cnt += c; sum += s2;
+        }
+        int lo = isNum ? 0 : 1;          // 已是数字则可填0；否则首个非零位从1起
+        int hi = isLimit ? s[i] - '0' : 9;
+        for (int cur = lo; cur <= hi; cur++) {
+            // 判断 pre1 是否成峰/谷（pre2、pre1 都必须真实存在）
+            int contrib = 0;
+            if (pre2 != 10 && pre1 != 10) {
+                if (pre1 > pre2 && pre1 > cur) contrib = 1;
+                else if (pre1 < pre2 && pre1 < cur) contrib = 1;
+            }
+            auto [c, s2] = dfs(i + 1, pre1, cur, isLimit && cur == hi, true);
+            cnt += c;
+            sum += s2 + (long long)contrib * c;   // 贡献乘以后续数字个数
+        }
+        if (!isLimit && isNum) {
+            vis[i][pre2][pre1] = true;
+            memo[i][pre2][pre1] = {cnt, sum};
+        }
+        return {cnt, sum};
     }
 };
