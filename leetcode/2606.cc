@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <climits>
 #include <cstring>
+#include <iostream>
 
 class Solution1 {
 public:
@@ -489,5 +490,137 @@ private:
             memo[i][pre2][pre1] = {cnt, sum};
         }
         return {cnt, sum};
+    }
+};
+
+class Solution22 {
+public:
+    std::vector<int> leftRightDifference(std::vector<int>& nums) {
+        int n = nums.size();
+        std::vector<int> ans(n, 0);
+        // 1. 统计左前缀和
+        for(int i=1; i<n; ++i){
+            ans[i] = ans[i-1] + nums[i-1];
+        }
+        int right = 0;
+        for(int i=n-2; i>=0; --i){
+            right += nums[i+1];
+            ans[i] = std::abs(ans[i] - right);
+        }
+        return ans;    }
+};
+
+class Solution23 {
+public:
+    bool isPalindrome(std::string s) {
+        auto preProcess = [](const std::string& s) -> std::string {
+            std::string ans;
+            for(char c: s){
+                if(c >= 'A' && c <= 'Z'){
+                    ans += (c+32);
+                }else if(c >= 'a' && c <= 'z'){
+                    ans += c;
+                }else if(c >= '0' && c <= '9'){
+                    ans += c;
+                }else{
+                    continue;
+                }
+            }
+            return ans;
+        };
+        auto isPalindrome = [](const std::string& s) -> bool{
+            if(s.size() == 0) return true;
+            int left = 0, right = s.size() - 1;
+            while(left < right){
+                if(s[left] != s[right]) return false;
+                left++;
+                right--;
+            }
+            return true;
+        };
+        std::string tmp = preProcess(s);
+        std::cout << tmp << std::endl;
+        return isPalindrome(tmp);
+    }
+};
+
+class Solution24 {
+public:
+    bool isSubsequence(std::string s, std::string t) {
+        if(s.size() > t.size()) return false;
+        int i = 0, j = 0;
+        while(i<s.size() && j<t.size() && i <= j){
+            if(s[i] == t[j]){
+                i++;
+                j++;
+            }else{
+                j++;
+            }
+        }
+        return i == s.size();
+    }
+};
+
+class Solution25 {
+public:
+    std::vector<int> twoSum(std::vector<int>& numbers, int target) {
+        int i = 0, j = numbers.size() - 1;
+        while(i<j){
+            if(numbers[i] + numbers[j] < target){
+                i++;
+            }else if(numbers[i] + numbers[j] > target){
+                j--;
+            }else{
+                return {i+1, j+1};
+            }
+        }
+        return {-1, -1};
+    }
+};
+
+class Solution26 {
+public:
+    int maxArea(std::vector<int>& height) {
+        int i = 0, j = height.size() - 1;
+        int ans = 0;
+        while(i < j){
+            ans = std::max(ans, ((j-i)*std::min(height[i], height[j])));
+            if(height[i] < height[j]) i++;
+            else j--;
+        }
+        return ans;
+    }
+};
+
+class Solution27 {
+public:
+    std::vector<std::vector<int>> threeSum(std::vector<int>& nums) {
+        // // 1. 去重
+        // std::set<int> s(nums.begin(), nums.end());
+        // nums = std::vector<int>(s.begin(), s.end());
+        // 2. 排序后，先固定个数，问题就转化为找出两个数之和等于 target = - nums[i]
+        std::sort(nums.begin(), nums.end());
+        int n = nums.size();
+        std::vector<std::vector<int>> ans;
+        for(int i=0; i<n;){
+            if(nums[i] > 0) break; // 剪枝
+
+            int j = i+1, k = n-1;
+            int target = -nums[i];
+            while(j < k){
+                if(nums[j] + nums[k] < target) j++;
+                else if(nums[j] + nums[k] > target) k--;
+                else {
+                    ans.push_back({nums[i], nums[j], nums[k]});
+                    int old_j = nums[j];
+                    int old_k = nums[k];
+                    while(j < k && nums[j] == old_j) j++;
+                    while(j < k && nums[k] == old_k) k--;
+                }
+            }
+            // 跳过相同的i
+            while(i < n && nums[i] == -target) i++;
+        }
+        return ans;
     }
 };
