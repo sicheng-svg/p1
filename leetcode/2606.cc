@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <stack>
 #include <algorithm>
 #include <climits>
@@ -622,5 +623,149 @@ public:
             while(i < n && nums[i] == -target) i++;
         }
         return ans;
+    }
+};
+
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+class Solution28 {
+public:
+    TreeNode* createBinaryTree(std::vector<std::vector<int>>& descriptions) {
+        std::unordered_map<int, TreeNode*> nodes;
+        std::unordered_set<int> isChild;
+        auto get = [&](int x) -> TreeNode* {
+            if(nodes.count(x) == 0) nodes[x] = new TreeNode(x);
+            return nodes[x];
+        };
+        for(auto& desc: descriptions){
+            TreeNode *child = get(desc[1]);// child不存在则新建
+            TreeNode *parent = get(desc[0]);// parent不存在则新建
+
+            if(desc[2])    parent->left = child;
+            else           parent->right = child;
+            isChild.insert(desc[1]);
+        }
+        // isChild中不存在的点就是root
+        for(auto& [val, node]: nodes){
+            if(!isChild.count(val)) return node;
+        }
+        return nullptr;
+    }
+};
+
+class Solution29 {
+public:
+    int minSubArrayLen(int target, std::vector<int>& nums) {
+        int i = 0, j = 0, n = nums.size();
+        int sum = 0;
+        int ans = INT_MAX;
+        while(j < n){
+            sum += nums[j++];
+            while(sum >= target) {
+                ans = std::min(ans, j - i);
+                sum -= nums[i++];
+            }
+        }
+        return ans == INT_MAX ? 0 : ans;
+    }
+};
+
+class Solution30 {
+public:
+    int lengthOfLongestSubstring(std::string s) {
+        int left = 0, right = 0, n = s.size();
+        int ans = 0;
+        std::unordered_map<char, int> dict;
+        while(right < n) {
+            // 1.进窗口
+            dict[s[right]]++;
+
+            // 2.判断
+            while(dict[s[right]] > 1){
+                // 3.出窗口
+                dict[s[left]]--;
+                left++;
+            }
+
+            // 3.满足条件更新结果
+            ans = std::max(ans, right - left + 1);
+            right++; // 走到下一个位置
+        }
+        return ans;
+    }
+};
+
+class Solution31 {
+public:
+    std::vector<int> findSubstring(std::string s, std::vector<std::string>& words) {
+        int n = s.size(), m = words.size(), z = words[0].size();
+        std::vector<int> ans;
+        int win = m*z;
+        if(n < win) return ans;
+
+        std::unordered_map<std::string, int> need;
+        for(auto word: words) need[word]++;
+
+        /* 1. 枚举起点 */
+        for(int i=0; i<z; ++i){
+            std::unordered_map<std::string, int> cnt;
+            int count = 0; // 记录有效字符的个数
+            for(int left=i, right=i; right+z<=n; right+=z){
+                // 进窗口
+                std::string in = s.substr(right, z);
+                cnt[in]++;
+                if (cnt.count(in) && need.count(in) && cnt[in] <= need[in]) count++;
+                // 判断
+                if(right+z-left > win){
+                    // 出窗口
+                    std::string out = s.substr(left, z);
+                    if (need.count(out) && cnt[out] <= need[out]) count--;
+                    cnt[out]--;
+                    left += z;
+                }
+                // 更新结果
+                if(count == m) ans.push_back(left);
+            }
+        }
+        return ans;
+    }
+};
+
+class Solution32 {
+public:
+    std::string minWindow(std::string s, std::string t) {
+        int m = s.size(), n = t.size();
+        std::unordered_map<char, int> needs;
+        for(auto& c: t) needs[c]++;
+
+        int left = 0, right = 0;
+        std::unordered_map<char, int> cnt;
+        int count = 0;
+        int len = INT_MAX, pos = 0;
+        while(right < m){
+            // 进窗口
+            cnt[s[right]]++;
+            if (needs.count(s[right]) && cnt[s[right]] <= needs[s[right]]) count++;
+            // 判断
+            while(count == n) {
+                // 更新结果
+                if(right-left + 1 < len){
+                    len = right-left + 1;
+                    pos = left;
+                }
+                // 出窗口
+                if (needs.count(s[left]) && cnt[s[left]] <= needs[s[left]]) count--;
+                cnt[s[left]]--;
+                left++;
+            }
+            right++;
+        }
+        return len == INT_MAX ? "" : s.substr(pos, len);
     }
 };
