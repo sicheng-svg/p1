@@ -7,6 +7,7 @@
 #include <climits>
 #include <cstring>
 #include <iostream>
+using namespace std;
 
 class Solution1 {
 public:
@@ -767,5 +768,156 @@ public:
             right++;
         }
         return len == INT_MAX ? "" : s.substr(pos, len);
+    }
+};
+
+class Solution33 {
+public:
+    vector<int> pivotArray(vector<int>& nums, int pivot) {
+        int n = nums.size(); 
+        std::vector<int> ans(n, pivot);
+        // 1. 统计小于pivot和等于pivot的个数,计算出它们的下标位置
+        int less = 0, eq = 0;
+        for(int x: nums){
+            if(x < pivot) ++less;
+            if(x == pivot) ++eq;
+        }
+        // 2. [0, less-1] [less, less+eq-1] [less+eq, n-1]
+        int i=0, j=less+eq;
+        for(int x: nums){
+            if(x < pivot) ans[i++] = x;
+            else if(x > pivot) ans[j++] = x;
+            else continue;
+        }
+        return ans;
+    }
+};
+
+class Solution34 {
+public:
+    bool isValidSudoku(vector<vector<char>>& board) {
+        bool row[9][9] = {}, col[9][9] = {}, boxes[9][9] = {};
+        for(int i=0; i<9; ++i){
+            for(int j=0; j<9; ++j){
+                if(board[i][j] == '.') continue;
+                int number = board[i][j] - '1';
+                int b = (i / 3) * 3 + j / 3;
+                if(row[i][number] || col[j][number] || boxes[b][number]) return false;
+                row[i][number] = col[j][number] = boxes[b][number] = true;
+            }
+        }
+        return true;
+    }
+};
+
+class Solution35 {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        int m = matrix.size(), n = matrix[0].size();
+        std::vector<int> ans;
+        int top = 0, bottom = m-1, left = 0, right = n-1;
+        while(top <= bottom && left <= right){
+            // 1. 左到右
+            for(int j=left; j<=right;++j) ans.push_back(matrix[top][j]);
+            top++;
+            if(top > bottom) break;
+
+            // 2. 从上到下
+            for(int i=top; i<=bottom; ++i) ans.push_back(matrix[i][right]);
+            right--;
+            if(left>right) break;
+
+            // 3. 从右到左
+            for(int j=right; j>=left; --j) ans.push_back(matrix[bottom][j]);
+            bottom--;
+            if(top > bottom) break;
+
+            // 4. 从下到上
+            for(int i=bottom; i>=top; --i) ans.push_back(matrix[i][left]);
+            left++;
+            if(left > right) break;
+        }
+        return ans;
+    }
+};
+
+class Solution36 {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        for(int i=0; i<n; ++i){
+            for(int j=i+1; j<n; ++j){
+                std::swap(matrix[i][j], matrix[j][i]); // 先沿对角线反转
+            }
+        }
+        for(int i=0; i<n; ++i){
+            for(int j=0; j<n/2; ++j){
+                std::swap(matrix[i][j], matrix[i][n-1-j]); // 水平反转
+            }
+        }
+    }
+};
+
+class Solution37 {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        int m = matrix.size(), n = matrix[0].size();
+        bool isrow = false, iscol = false;
+        // 判断第一行和第一列是否含0
+        for(int i=0; i<m; ++i){
+            if(matrix[i][0] == 0) iscol = true;
+        }
+        for(int j=0; j<n; ++j){
+            if(matrix[0][j] == 0) isrow = true;
+        }
+
+        // 从中间开始，进行标记
+        for(int i=1; i<m; ++i){
+            for(int j=1; j<n; ++j){
+                if(matrix[i][j] == 0) {
+                    matrix[0][j] = 0;
+                    matrix[i][0] = 0;
+                }
+            }
+        } 
+
+        // 将标记的位置全部变成0
+        for(int i=1; i<m; ++i){
+            for(int j=1; j<n; ++j){
+                if(matrix[0][j] == 0 || matrix[i][0] == 0){
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+
+        // 最后判断第一行和第一列是否含0，如果有则变0
+        if(isrow)
+            for(int j=0; j<n; ++j)
+                matrix[0][j] = 0;
+        if(iscol)
+            for(int i=0; i<m; ++i)
+                matrix[i][0] = 0;
+    }
+};
+
+class Solution38 {
+public:
+    void gameOfLife(vector<vector<int>>& board) {
+        int m = board.size(), n = board[0].size();
+        int dirs[8][2] = {{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}};
+        for (int i = 0; i < m; ++i)
+            for (int j = 0; j < n; ++j) {
+                int alive = 0;
+                for (auto& d : dirs) {
+                    int ni = i + d[0], nj = j + d[1];
+                    if (ni>=0 && ni<m && nj>=0 && nj<n && (board[ni][nj] & 1)) ++alive;
+                }
+                int cur = board[i][j] & 1;
+                if ((cur && (alive==2 || alive==3)) || (!cur && alive==3))
+                    board[i][j] |= 2;
+            }
+        for (int i = 0; i < m; ++i)
+            for (int j = 0; j < n; ++j)
+                board[i][j] >>= 1;
     }
 };
