@@ -7,6 +7,7 @@
 #include <climits>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 class Solution1 {
@@ -919,5 +920,151 @@ public:
         for (int i = 0; i < m; ++i)
             for (int j = 0; j < n; ++j)
                 board[i][j] >>= 1;
+    }
+};
+
+class Solution39 {
+public:
+    long long maxTotalValue(vector<int>& nums, int k) {
+        // 题目要求找到k个子数组，要求这些子数组的和最大。并且子数组可以重复选取
+        // 所以，我们只需要找到值最大的子数组，*k
+        // 而值最大的子数组肯定存在于原数组中
+        int m1 = INT_MIN, m2 = INT_MAX;
+        for(int x: nums){
+            m1 = std::max(m1, x);
+            m2 = std::min(m2, x);
+        }
+        return static_cast<long long>(m1-m2) * k;
+    }
+};
+
+class Solution40 {
+public:
+    bool canConstruct(string ransomNote, string magazine) {
+        if(ransomNote.size() > magazine.size()) return false;
+        
+        int dict[26] = {};
+        for(char c: magazine){
+            dict[c-'a']++;
+        }
+
+        for(char c: ransomNote){
+            dict[c-'a']--;
+            if(dict[c-'a'] < 0) return false;
+        }
+        return true;
+    }
+};
+
+class Solution41 {
+public:
+    bool isIsomorphic(string s, string t) {
+        int s2t[128] = {}, t2s[128] = {};
+        int n = s.size();
+        for(int i=0; i<n; ++i){
+            char a = s[i], b = t[i];
+            if(s2t[a] && s2t[a] != b) return false;
+            if(t2s[b] && t2s[b] != a) return false;
+            s2t[a] = b;
+            t2s[b] = a;
+        }
+        return true;
+    }
+};
+
+class Solution42 {
+public:
+    bool wordPattern(string pattern, string s) {
+        // 切分 s
+        vector<string> words;
+        stringstream ss(s);
+        string w;
+        while (ss >> w) words.push_back(w);
+
+        // 长度必须匹配（这就是 word_pattern 比 isomorphic 多出来的坑）
+        if (pattern.size() != words.size()) return false;
+
+        unordered_map<char, string> c2w;
+        unordered_map<string, char> w2c;
+        for (int i = 0; i < pattern.size(); i++) {
+            char c = pattern[i];
+            string& word = words[i];
+            if (c2w.count(c) && c2w[c] != word) return false;
+            if (w2c.count(word) && w2c[word] != c) return false;
+            c2w[c] = word;
+            w2c[word] = c;
+        }
+        return true;
+    }
+};
+
+class Solution43 {
+public:
+    bool isAnagram(string s, string t) {
+        if(s.size() != t.size()) return false;
+        int dict[26] = {0};
+        for(char c: s){
+            dict[c-'a']++;
+        }
+        for(char c: t){
+            if(--dict[c-'a'] < 0) return false;
+        }
+        return true;
+    }
+};
+
+class Solution44 {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        // 对于字符异位词来说，他们排序后是相同的
+        // 利用哈希表统计，将排序后相同的插入到一个位置上
+        std::unordered_map<std::string, std::vector<std::string>> hash;
+        for(auto& str : strs) {
+            std::string tmp = str;
+            sort(tmp.begin(), tmp.end());
+            hash[tmp].push_back(str);
+        }
+        std::vector<std::vector<std::string>> ret;
+        for(auto& [key, value] : hash) {
+            ret.push_back(value);
+        }
+        return ret;
+    }
+};
+
+class Solution45 {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int, int> seen;  // 值 → 下标
+        for (int i = 0; i < nums.size(); i++) {
+            int need = target - nums[i];
+            if (seen.count(need))        // 之前见过另一半?
+                return {seen[need], i};
+            seen[nums[i]] = i;           // 没见过,把自己存进去
+        }
+        return {};
+    }
+};
+
+class Solution46 {
+public:
+    int next(int x) {
+        int sum = 0;
+        while (x > 0) {
+            int d = x % 10;
+            sum += d * d;
+            x /= 10;
+        }
+        return sum;
+    }
+    bool isHappy(int n) {
+        // 对于快乐数而言，要么最终到1，要么会进入一个循环
+        // 所以，我们就可以判断序列是否含环即可。
+        int slow = n, fast = next(n);
+        while (fast != 1 && slow != fast) {
+            slow = next(slow);          // 走一步
+            fast = next(next(fast));    // 走两步
+        }
+        return fast == 1;
     }
 };
