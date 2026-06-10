@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <stack>
+#include <queue>
 #include <algorithm>
 #include <climits>
 #include <cstring>
@@ -1066,5 +1067,110 @@ public:
             fast = next(next(fast));    // 走两步
         }
         return fast == 1;
+    }
+};
+
+class Solution47 {
+public:
+    long long maxTotalValue(vector<int>& nums, int k) {
+        int n = nums.size();
+        int LOG = 1;
+        while ((1 << LOG) <= n) LOG++;
+        vector<vector<int>> mx(LOG, vector<int>(n)), mn(LOG, vector<int>(n));
+        for (int i = 0; i < n; i++) mx[0][i] = mn[0][i] = nums[i];
+        for (int j = 1; j < LOG; j++)
+            for (int i = 0; i + (1 << j) <= n; i++) {
+                mx[j][i] = max(mx[j-1][i], mx[j-1][i + (1 << (j-1))]);
+                mn[j][i] = min(mn[j-1][i], mn[j-1][i + (1 << (j-1))]);
+            }
+        auto query = [&](int l, int r) -> int { // [l, r] 的 max - min
+            int s = 31 - __builtin_clz(r - l + 1);
+            int mxv = max(mx[s][l], mx[s][r - (1 << s) + 1]);
+            int mnv = min(mn[s][l], mn[s][r - (1 << s) + 1]);
+            return mxv - mnv;
+        };
+        // 堆元素: {value, l, r}
+        priority_queue<tuple<int,int,int>> pq;
+        for (int l = 0; l < n; l++)
+            pq.push({query(l, n - 1), l, n - 1});
+        long long ans = 0;
+        while (k-- > 0) {
+            auto [v, l, r] = pq.top(); pq.pop();
+            ans += v;
+            if (r > l) pq.push({query(l, r - 1), l, r - 1});
+        }
+        return ans;
+    }
+};
+
+class Solution48 {
+public:
+    bool containsNearbyDuplicate(vector<int>& nums, int k) {
+        unordered_set<int> window;
+        for (int i = 0; i < nums.size(); ++i) {
+            if (i > k) window.erase(nums[i - k - 1]);  // 移出窗口外的最老元素
+            if (window.count(nums[i])) return true;     // 窗口内有重复
+            window.insert(nums[i]);
+        }
+        return false;
+    }
+};
+
+class Solution49 {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        std::unordered_set<int> st;
+        for(int e: nums) st.insert(e);
+        // 想要找到最长序列，只需要判断当前数是不是序列的开头即可
+        // 如果是开头的话，就因此在集合中找+1是否存在，同时记录个数
+        int ans = 0;
+        for(int num: st){
+            if(!st.count(num-1)) {
+                // 是一个序列的开头，继续找
+                int count = 1;
+                while(st.count(num+1)){
+                    count++;
+                    num++;
+                }
+                ans = std::max(ans, count);
+            }
+        }
+        return ans;
+    }
+};
+
+class Solution50 {
+public:
+    vector<string> summaryRanges(vector<int>& nums) {
+        std::vector<std::string> ans;
+        int i = 0;
+        while(i<nums.size()){
+            int j = i;
+            while(i + 1 < nums.size() && nums[i] + 1 == nums[i+1]) i++;
+            if(i == j) ans.push_back(std::to_string(nums[i]));
+            else ans.push_back(std::to_string(nums[j]) + "->" + std::to_string(nums[i]));
+            i++; // 走到下一个区间
+        }
+        return ans;
+    }
+};
+
+class Solution51 {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end()); // 默认按第一个元素排序
+
+        vector<vector<int>> ans;
+        for (const auto& interval : intervals) {
+            int s = interval[0], e = interval[1];
+            // 答案为空，或当前区间和上一个合并结果不重叠 -> 新开一段
+            if (ans.empty() || ans.back()[1] < s) {
+                ans.push_back({s, e});
+            } else {
+                // 重叠 -> 撑大上一段的右端点
+                ans.back()[1] = max(ans.back()[1], e);
+            }
+        }
+        return ans;
     }
 };
