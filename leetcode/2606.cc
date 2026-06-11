@@ -1174,3 +1174,94 @@ public:
         return ans;
     }
 };
+
+class Solution52 {
+public:
+    int assignEdgeWeights(vector<vector<int>>& edges) {
+        const int MOD = 1e9 + 7;
+        int n = edges.size() + 1;
+
+        // 1. 将edges转换为邻接表
+        std::vector<std::vector<int>> adj(n + 1);
+        for(auto& edge: edges){
+            adj[edge[0]].push_back(edge[1]);
+            adj[edge[1]].push_back(edge[0]);
+        }
+
+        // 2. bfs找到最深节点
+        std::vector<int> depth(n+1, -1);
+        depth[1] = 0;
+        std::queue<int> q;
+        q.push(1);
+        int k = 0; // 最深节点所对应的边的条数
+        while(!q.empty()){
+            int x = q.front(); q.pop();
+            for(int neighbor: adj[x]){
+                if(depth[neighbor] == -1){ // 该节点没有访问
+                    depth[neighbor] = depth[x] + 1;
+                    k = std::max(k, depth[neighbor]);
+                    q.push(neighbor);
+                }
+            }
+        }
+        // 快速幂求 2^(k-1)
+        long long res = 1, base = 2;
+        int e = k - 1;
+        while (e > 0) {
+            if (e & 1) res = res * base % MOD;
+            base = base * base % MOD;
+            e >>= 1;
+        }
+        return (int)res;
+    }
+};
+
+class Solution53 {
+public:
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        vector<vector<int>> res;
+        int i = 0;
+        int n = intervals.size();
+        
+        // 1. 左侧不重叠区间
+        while (i < n && intervals[i][1] < newInterval[0]) {
+            res.push_back(intervals[i]);
+            i++;
+        }
+        
+        // 2. 找到重叠区间，不断扩大 newInterval 的范围
+        while (i < n && intervals[i][0] <= newInterval[1]) {
+            newInterval[0] = min(newInterval[0], intervals[i][0]);
+            newInterval[1] = max(newInterval[1], intervals[i][1]);
+            i++;
+        }
+        res.push_back(newInterval); // 把最终合并好的新区间放入结果
+        
+        // 3. 右侧不重叠区间
+        while (i < n) {
+            res.push_back(intervals[i]);
+            i++;
+        }
+        
+        return res;
+    }
+};
+
+class Solution54 {
+public:
+    int findMinArrowShots(vector<vector<int>>& points) {
+        // 不能直接合并区间，本质上我们要找到区间的重叠部分
+        sort(points.begin(), points.end(), [](const std::vector<int>& v1, const std::vector<int>& v2){
+            return v1[1] < v2[1];
+        });
+        int arrows = 1;
+        int cur = points[0][1];
+        for(int i=1; i<points.size(); ++i){
+            if(cur < points[i][0]){// 前后区间没有重叠，需要新箭
+                arrows++;
+                cur = points[i][1];
+            }  
+        }
+        return arrows;
+    }
+};
