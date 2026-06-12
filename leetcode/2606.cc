@@ -1265,3 +1265,117 @@ public:
         return arrows;
     }
 };
+
+class Solution55 {
+    static const int MOD = 1e9 + 7;
+public:
+    vector<int> assignEdgeWeights(vector<vector<int>>& edges, vector<vector<int>>& queries) {
+        int n = edges.size() + 1;
+        int LOG = 1;
+        while ((1 << LOG) < n) LOG++;
+        LOG++;
+
+        // 将edges转换为邻接表
+        vector<vector<int>> g(n + 1);
+        for (auto& e : edges) {
+            g[e[0]].push_back(e[1]);
+            g[e[1]].push_back(e[0]);
+        }
+
+        // BFS 求 depth 和直接父亲
+        vector<int> depth(n + 1, 0), par(n + 1, 0);
+        vector<bool> vis(n + 1, false);
+        queue<int> q;
+        q.push(1); vis[1] = true;
+        while (!q.empty()) {
+            int u = q.front(); q.pop();
+            for (int v : g[u]) if (!vis[v]) {
+                vis[v] = true;
+                depth[v] = depth[u] + 1;
+                par[v] = u;
+                q.push(v);
+            }
+        }
+
+        // 倍增表
+        vector<vector<int>> up(LOG, vector<int>(n + 1, 0));
+        for (int v = 1; v <= n; v++) up[0][v] = par[v];
+        for (int j = 1; j < LOG; j++)
+            for (int v = 1; v <= n; v++)
+                up[j][v] = up[j-1][ up[j-1][v] ];
+
+        // 预处理 2 的幂
+        vector<long long> pow2(n + 1);
+        pow2[0] = 1;
+        for (int i = 1; i <= n; i++) pow2[i] = pow2[i-1] * 2 % MOD;
+
+        auto lca = [&](int u, int v) -> int {
+            if (depth[u] < depth[v]) swap(u, v);
+            int d = depth[u] - depth[v];
+            for (int j = 0; j < LOG; j++)
+                if (d & (1 << j)) u = up[j][u];
+            if (u == v) return u;
+            for (int j = LOG - 1; j >= 0; j--)
+                if (up[j][u] != up[j][v]) { u = up[j][u]; v = up[j][v]; }
+            return up[0][u];
+        };
+
+        vector<int> ans;
+        for (auto& qq : queries) {
+            int u = qq[0], v = qq[1];
+            int w = lca(u, v);
+            int k = depth[u] + depth[v] - 2 * depth[w];
+            ans.push_back(k == 0 ? 0 : (int)pow2[k - 1]);
+        }
+        return ans;
+    }
+};
+
+class Solution56 {
+public:
+    bool isValid(string s) {
+        std::stack<char> st;
+        for(char ch: s){
+            if(ch == '(' || ch == '[' || ch == '{'){
+                st.push(ch);
+            }else{
+                if(st.empty()) return false;
+
+                char c = st.top(); st.pop();
+                if((ch == ')' && c != '(')
+                || (ch == ']' && c != '[')
+                || (ch == '}' && c != '{')){
+                    return false;
+                }
+            }
+        }
+        return st.empty();
+    }
+};
+
+class Solution57 {
+public:
+    string simplifyPath(string path) {
+        std::vector<std::string> st;   // 用 vector 当栈,方便最后正序拼接
+        std::string seg;
+        std::stringstream ss(path);
+
+        // 按 '/' 切分,getline 会把两个 '/' 之间的内容(可能为空)给 seg
+        while (std::getline(ss, seg, '/')) {
+            if (seg == "" || seg == ".") {
+                continue;                       // 空段 或 当前目录,跳过
+            } else if (seg == "..") {
+                if (!st.empty()) st.pop_back();  // 回上级,空栈时不动
+            } else {
+                st.push_back(seg);               // 真正的目录名
+            }
+        }
+
+        // 拼接:每段前加一个 '/'
+        std::string ans;
+        for (const std::string& s : st) {
+            ans += "/" + s;
+        }
+        return ans.empty() ? "/" : ans;          // 全空说明是根目录
+    }
+};
