@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <stack>
 #include <queue>
+#include <functional>
 #include <algorithm>
 #include <climits>
 #include <cstring>
@@ -1377,5 +1378,90 @@ public:
             ans += "/" + s;
         }
         return ans.empty() ? "/" : ans;          // 全空说明是根目录
+    }
+};
+
+class Solution58 {
+public:
+    string mapWordWeights(vector<string>& words, vector<int>& weights) {
+        std::string ans;
+        for(auto& word: words){
+            int sum = 0;
+            for(auto c: word){
+                sum += weights[c-'a'];
+            }
+            sum %= 26;
+            ans.push_back( 'a' + (25-sum));
+        }
+        return ans;
+    }
+};
+
+class MinStack {
+public:
+    MinStack() {
+    }
+    
+    void push(int val) {
+        if(minSt.empty() || val <= minSt.top()){
+            st.push(val);
+            minSt.push(val);
+        }else{
+            st.push(val);
+        }
+    }
+    
+    void pop() {
+        if(st.top() == minSt.top()) {
+            st.pop();
+            minSt.pop();
+        }else{
+            st.pop();
+        }
+    }
+    
+    int top() {
+        return st.top();
+    }
+    
+    int getMin() {
+        return minSt.top();
+    }
+private:
+    std::stack<int> minSt;
+    std::stack<int> st;
+};
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack* obj = new MinStack();
+ * obj->push(val);
+ * obj->pop();
+ * int param_3 = obj->top();
+ * int param_4 = obj->getMin();
+ */
+
+class Solution60 {
+public:
+    std::unordered_map<std::string, std::function<int(int, int)>> method {
+        {"+", [](int left, int right){ return left + right;}},
+        {"-", [](int left, int right){ return left - right;}},
+        {"*", [](int left, int right){ return left * right;}},
+        {"/", [](int left, int right){ return left / right;}}
+    };
+
+    int evalRPN(std::vector<std::string>& tokens) {
+        // 遍历数组进行压栈，当遇到操作符时，连续弹出两次，根据操作符进行运算，随后重新压入栈中
+        std::stack<int> st;
+        for(auto& e : tokens) {
+            if(method.count(e)) {
+                int right = st.top(); st.pop();
+                int left = st.top(); st.pop();
+                st.push(method[e](left,right));
+            }else {
+                st.push(stoi(e));
+            }
+        }
+        return st.top();
     }
 };
