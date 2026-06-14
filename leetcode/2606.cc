@@ -1465,3 +1465,239 @@ public:
         return st.top();
     }
 };
+
+
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
+class Solution61 {
+public:
+    int pairSum(ListNode* head) {
+        ListNode* fast = head;
+        ListNode* slow = head;
+        ListNode* pre = nullptr;
+        while(fast && fast->next){
+            fast = fast->next->next;
+            pre = slow;
+            slow = slow->next;
+        }
+        // slow是后半部分的起始节点,pre是前半部分的结尾
+        pre->next = nullptr;
+        ListNode* cur = slow;
+        ListNode* prev = nullptr;
+        while(cur){
+            ListNode* nxt = cur->next;
+            cur->next = prev;
+            prev = cur;
+            cur = nxt;
+        }
+
+        int ans = 0;
+        while(head && prev){
+            ans = std::max(ans, head->val + prev->val);
+            head = head->next;
+            prev = prev->next;
+        }
+        return ans;
+    }
+};
+
+class Solution62 {
+public:
+    int calculate(string s) {
+        std::stack<int> st;
+        int res = 0, sign = 1;
+        long long num = 0;
+        for(char c: s){
+            if(isdigit(c)){
+                num = num * 10 + (c - '0'); // 数字可能有好几位
+            }else if(c == '+'){
+                res += num * sign;
+                sign = 1;
+                num = 0;
+            }else if(c == '-'){
+                res += num * sign;
+                sign = -1;
+                num = 0;
+            }else if(c == '('){
+                // 遇到(，先将前面的临时存储起来用一组新的sign和res计算
+                st.push(res);
+                st.push(sign);
+                res = 0;
+                sign = 1;
+            }else if(c == ')') {
+                res += sign * num;
+                num = 0;
+
+                // 遇到),说明括号内要计算完了，和前面的进行计算
+                res = res * st.top(); st.pop();
+                res += st.top(); st.pop();
+                sign = 1;
+            }else{}
+        }
+        return res + num*sign; // 将最后一个数加上
+    }
+};
+
+class Solution63 {
+public:
+    bool hasCycle(ListNode *head) {
+        ListNode *fast = head, *slow = head;
+        while(fast && fast->next){
+            fast = fast->next->next;
+            slow = slow->next;
+            if(fast == slow) return true;
+        }   
+        return false;
+    }
+};
+
+class Solution64 {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* dummy = new ListNode();
+        ListNode* tail = dummy;
+        int carry = 0;
+        while(l1 || l2 || carry){
+            int sum = (l1 ? l1->val : 0) + (l2 ? l2->val : 0) + carry;   
+            carry = sum / 10;
+            ListNode* newNode = new ListNode(sum%10);
+            tail->next = newNode;
+            tail = newNode;
+            if (l1) l1 = l1->next;           
+            if (l2) l2 = l2->next;
+        }
+        tail = dummy->next;
+        delete dummy;
+        return tail;
+    }
+};
+
+class Solution65 {
+public:
+    // 递归
+    ListNode* _mergeTwoLists(ListNode* list1, ListNode* list2) {
+        if(!list1 || !list2) return list1 ? list1 : list2;
+        if(list1->val < list2->val){
+            list1->next = mergeTwoLists(list1->next, list2);
+            return list1;
+        }else{
+            list2->next = mergeTwoLists(list1, list2->next);
+            return list2;
+        }
+    }
+    // 迭代
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        ListNode* dummy = new ListNode();
+        ListNode* tail = dummy;
+        while(list1 && list2){
+            if(list1->val < list2->val){
+                tail->next= list1;
+                tail = list1;
+                if(list1)
+                    list1 = list1->next;
+            }else{
+                tail->next = list2;
+                tail = list2;
+                if(list2)
+                    list2 = list2->next;
+            }
+        }
+        ListNode* other = list1 ? list1 : list2;
+        tail->next = other;
+        tail = dummy->next;
+        delete dummy;
+        return tail;
+    }
+};
+
+class Node {
+public:
+    int val;
+    Node* next;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
+};
+
+class Solution66 {
+public:
+    Node* copyRandomList(Node* head) {
+        if(!head) return nullptr;
+        // 1. 将copy链表插入到对应原节点的后面
+        for(Node* cur=head; cur; cur=cur->next->next){
+            Node* copy = new Node(cur->val);
+            copy->next = cur->next;
+            cur->next = copy;
+        }
+
+        // 2. 设置copy节点的random指针
+        for(Node* cur=head; cur; cur=cur->next->next){
+            if(cur->random){
+                cur->next->random = cur->random->next;
+            }
+        }
+
+        // 3. 将两个链表拆开
+        Node* dummy = new Node(0);
+        Node* tail = dummy;
+        for(Node* cur=head; cur; cur=cur->next){
+            tail->next = cur->next;
+            tail = cur->next;
+            cur->next = cur->next->next; // 还原原链表
+        }
+        tail = dummy->next;
+        delete dummy;
+        return tail;
+    }
+
+    Node* __copyRandomList(Node* head) {
+        std::unordered_map<Node*, Node*> map;
+        for(Node *cur=head; cur; cur=cur->next){
+            map[cur] = new Node(cur->val);
+        }
+        for(Node* cur = head; cur; cur=cur->next){
+            map[cur]->next = map[cur->next];
+            map[cur]->random = map[cur->random];
+        }
+        return map[head];
+    }
+
+    Node* _copyRandomList(Node* head) {
+        if(!head) return head;
+
+        std::unordered_map<Node*, Node*> hash;
+        Node dummy(0);
+        Node *cur = head, *tail = &dummy;
+        while(cur){
+            Node *newNode = new Node(cur->val);
+            newNode->next = nullptr;
+            tail->next = newNode;
+            tail = newNode;
+
+            hash[cur] = newNode; // 旧节点 -> 新节点
+            cur = cur->next;
+        }
+
+        cur = head;
+        Node *copy = dummy.next;
+        while(cur){
+            if(cur->random == nullptr) copy->random = nullptr;
+            else{
+                copy->random = hash[cur->random]; // cur->random指向的节点，映射的就是我们需要的新random
+            }
+            cur = cur->next;
+            copy = copy->next;
+        }
+        return dummy.next;
+    }
+};
