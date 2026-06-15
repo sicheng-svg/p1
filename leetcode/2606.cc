@@ -1701,3 +1701,44 @@ public:
         return dummy.next;
     }
 };
+
+class Solution67 {
+public:
+    ListNode* deleteMiddle(ListNode* head) {
+        if(head->next == nullptr) return nullptr;
+        ListNode* fast = head, *slow=head,*prev = nullptr;
+        while(fast && fast->next){
+            fast=fast->next->next;
+            prev = slow;
+            slow=slow->next;
+        }
+        if(prev) prev->next=slow->next;
+        return head;
+    }
+};
+
+class Solution68 {
+public:
+    ListNode* reverseBetween(ListNode* head, int left, int right) {
+        // 借助虚拟头节点，这里是left和right指的是第几个节点，下标从1开始
+        // 1. 创建一个虚拟头节点，找到left的前一个节点
+        // 2. 从left开始，反转right-left个节点即可
+        // 3. 此时cur指向after right，prev是新头，更新指向即可
+        ListNode dummy(0, head);
+        ListNode* beLeft = &dummy;
+        for (int i = 1; i < left; ++i) beLeft = beLeft->next;
+
+        ListNode* prev = nullptr;
+        ListNode* cur = beLeft->next;
+        for (int i = 0; i <= right - left; ++i) {
+            ListNode* next = cur->next;
+            cur->next = prev;
+            prev = cur;
+            cur = next;
+        }
+        // cur 现在是 afRight，prev 是反转段新头
+        beLeft->next->next = cur;
+        beLeft->next = prev;
+        return dummy.next;
+    }
+};
