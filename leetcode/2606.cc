@@ -1742,3 +1742,153 @@ public:
         return dummy.next;
     }
 };
+
+class Solution69 {
+public:
+    string processStr(string s) {
+        std::string result;
+        for(char c: s){
+            if(isalpha(c)){
+                result.push_back(c);
+            }else if(c == '*' && result.size() > 0){
+                result.pop_back();
+            }else if(c == '#'&& result.size() > 0){
+                result += result;
+            }else if(c == '%' && result.size() > 0){
+                reverse(result.begin(), result.end());
+            }else{
+                continue;
+            }
+        }
+        return result;
+    }
+};
+
+class Solution70 {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k){
+        // 1.先检查够不都k个，不够直接返回
+        ListNode *check = head;
+        for(int i=0; i<k; ++i){
+            while(!check) return head;
+            check = check->next;
+        }
+
+        // 2.我们无条件相信该函数可以将后面剩余的部分反转好。
+        // 我们只需要反转当前的即可。
+        ListNode *prev = nullptr, *cur = head;
+        for(int i=0; i<k; ++i){
+            ListNode *next = cur->next;
+            cur->next = prev;
+            prev = cur;
+            cur = next;
+        }
+
+        // 3.此时prev是反转后的新头，head是尾，让head->next指向后面部分
+        head->next = reverseKGroup(cur, k);
+        return prev;
+    }
+    ListNode* _reverseKGroup(ListNode* head, int k) {
+        ListNode dummy(0, head);
+        ListNode *groupPrev = &dummy;
+        for(;;){
+            // 1. 判断链表够不够k个
+            ListNode *check = groupPrev;
+            for(int i=0; i<k; ++i){
+                check = check->next;
+                if(!check) return dummy.next;
+            }
+            // 2. 反转k个
+            ListNode *prev = nullptr, *cur = groupPrev->next;
+            for(int i=0; i<k; ++i){
+                ListNode *next = cur->next;
+                cur->next = prev;
+                prev = cur;
+                cur = next;
+            }
+            // 3. 更新指针
+            // groupPrev prev cur 
+            // groupPrev是前一组的头， prev是反转后的头，cur是待操作的头
+            ListNode *groupTail = groupPrev->next;  // groupPrev->next原是头，反转后为尾
+            groupTail->next = cur;  // 反转后的尾接到下一次的头
+            groupPrev->next = prev; // 前一组的头接反转后的头
+            groupPrev = groupTail;  // groupPrev走到下一次的前一个节点
+        }
+    }
+};
+
+class Solution71 {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        // 快慢指针，让快指针先走n，然后fast和slow同步开始走，保证两个指针之间的距离差一直是n
+        // 当fast走到最后一个节点时，此时slow位置就是待删除节点的前一个
+        ListNode dummy(0, head);
+        ListNode *fast = &dummy, *slow = &dummy;
+        for(int i=0; i<n; ++i){
+            fast = fast->next;
+        }
+        while(fast->next){
+            slow = slow->next;
+            fast = fast->next;
+        }
+        ListNode *del = slow->next;
+        slow->next = del->next;
+        delete del;
+        return dummy.next;
+    }
+
+    ListNode* _removeNthFromEnd(ListNode* head, int n) {
+        if(!head->next) return nullptr;
+        // 1. 先统计节点数
+        int count = 0;
+        ListNode *cur = head;
+        while(cur){
+            cur = cur->next;
+            count++;
+        }
+        // 2. 将倒数第n个转换为整数第count-n个
+        ListNode* prev = nullptr;
+        cur = head;
+        for(int i=0; i<count-n; ++i){
+            prev = cur;
+            cur = cur->next;
+        }
+        // 3. 删除cur节点
+        ListNode* next = cur->next;
+        if(!prev) head = next;
+        else prev->next = next;
+        delete cur;
+        return head;
+    }
+};
+
+class Solution72 {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if(head == nullptr) return head;
+        ListNode dummy(0, head);
+        ListNode *cur = head, *prev = &dummy;
+        while(cur){
+            int val = cur->val;
+            int count = 1;
+            ListNode *next = cur->next;
+            while(next && next->val == val){
+                next = next->next;
+                count++;
+            }
+            // prev ... next
+            if(count > 1){
+                prev->next = next;
+                while(cur != next){
+                    ListNode *del = cur;
+                    cur = cur->next;
+                    delete del;
+                }
+            }else{
+                prev = cur;
+                cur = next;
+            }
+        }
+        return dummy.next;
+    }
+};
