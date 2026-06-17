@@ -1892,3 +1892,178 @@ public:
         return dummy.next;
     }
 };
+
+class Solution73 {
+ public:
+  char processStr(string s, long long k) {
+    long long cnts = 0;
+    for (char c : s) {
+      switch (c) {
+        case '*': {
+          if (cnts) --cnts;
+        } break;
+        case '#': {
+          cnts *= 2;
+        } break;
+        case '%': {
+        } break;
+        default: {
+          cnts++;
+        } break;
+      }
+    }
+    if (cnts <= k) return '.';
+    for (int i = s.size() - 1; i >= 0; --i) {
+      char c = s[i];
+      switch (c) {
+        case '*': {
+          cnts++;
+        } break;
+        case '#': {
+          cnts /= 2;
+          if (k >= cnts) k -= cnts;
+        } break;
+        case '%': {
+          k = cnts - 1 - k;
+        } break;
+        default: {
+          if (--cnts == k) return c;
+        } break;
+      }
+    }
+    return '.';
+  }
+};
+
+class Solution74 {
+public:
+    ListNode* rotateRight(ListNode* head, int k) {
+        if(!head) return nullptr;
+        ListNode *cur = head;
+        int count = 1;
+        while(cur->next){
+            cur = cur->next;
+            count++;
+        }
+        // 让链表成环
+        cur->next = head;
+        k %= count;
+        int step = count - k;
+        ListNode* prev = nullptr;
+        while(step--){
+            prev = head;
+            head = head->next;
+        }
+        prev->next = nullptr;
+        return head;
+    }
+};
+
+class Solution75 {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        ListNode dummy1(0), dummy2(0);
+        ListNode *tail1 = &dummy1, *tail2 = &dummy2;
+        ListNode *cur = head;
+        while(cur){
+            if(cur->val < x) {
+                tail1->next = cur;
+                tail1 = cur;
+            }else{
+                tail2->next = cur;
+                tail2 = cur;
+            }
+            cur = cur->next;
+        }
+        tail1->next = dummy2.next;
+        tail2->next = nullptr;
+        return dummy1.next;
+    }
+};
+
+class LRUCache {
+    struct LRUNode{
+        int key, value;
+        LRUNode* prev;
+        LRUNode* next;
+        LRUNode():key(0), value(0), prev(nullptr), next(nullptr){}
+        LRUNode(int key, int value):key(key), value(value), prev(nullptr), next(nullptr){}
+    };
+public:
+    LRUCache(int capacity): capacity(capacity), 
+                            head(new LRUNode()), 
+                            tail(new LRUNode()) {
+        head->next = tail;
+        head->prev = nullptr;
+        tail->prev = head;
+        tail->next = nullptr;
+    }
+    ~LRUCache(){
+        while(head){
+            auto next = head->next;
+            head->next = nullptr;
+            head->prev = nullptr;
+            delete head;
+            head = next;
+        }
+        head = tail = nullptr;
+    }
+    
+    int get(int key) {
+        if(!cache.count(key)) return -1;
+        //访问存在的缓存，需要将其插入到头部，表示最近访问过
+        move2Head(cache[key]);
+        return cache[key]->value;
+    }
+    
+    void put(int key, int value) {
+        if(cache.count(key)){
+            cache[key]->value = value;
+            move2Head(cache[key]);
+            return;
+        }
+        if(cache.size() + 1 > capacity){
+            removeLRU();
+        }
+        LRUNode *newNode = new LRUNode(key, value);
+        cache[key] = newNode;
+        insert(newNode);
+    }
+private:
+    void move2Head(LRUNode *node){
+        if(node->prev == head) return;
+        // 先从双向链表上切下来
+        LRUNode *prev = node->prev, *next = node->next;
+        prev->next = next;
+        next->prev = prev;
+
+        // 插入到头部
+        node->next = head->next;
+        node->prev = head;
+        head->next->prev = node;
+        head->next = node;
+    }
+
+    void insert(LRUNode *node){
+        node->next = head->next;
+        node->prev = head;
+        head->next->prev = node;
+        head->next = node;
+    }
+
+    void removeLRU(){
+        // 插入元素后，大于capacity，删除最近最少使用的节点，也就是tail->prev
+        // prev need tail
+        LRUNode *need = tail->prev;
+        LRUNode *prev = need->prev;
+        prev->next = tail;
+        tail->prev = prev;
+        cache.erase(need->key);
+        delete need;
+    }
+
+    std::unordered_map<int, LRUNode*> cache;
+    LRUNode *head;
+    LRUNode *tail;
+    int capacity;
+};
