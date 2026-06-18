@@ -2067,3 +2067,91 @@ private:
     LRUNode *tail;
     int capacity;
 };
+
+class Solution76 {
+public:
+    double angleClock(int hour, int minutes) {
+        double minAngle = minutes * 6.0;
+        double hourAngle = (hour % 12) * 30.0 + minutes * 0.5;
+        double diff = abs(hourAngle - minAngle);
+        return min(diff, 360.0 - diff);
+    }
+};
+
+class Solution77 {
+public:
+    int maxDepth(TreeNode* root) {
+        if(root == nullptr) return 0;
+        return 1 + std::max(maxDepth(root->left), maxDepth(root->right));
+    }
+    int _maxDepth(TreeNode* root) {
+        if(!root) return 0;
+        std::queue<TreeNode*> q;
+        q.push(root);
+        int depth = 0;
+        while(!q.empty()){
+            int sz = q.size();
+            while(sz--){
+                TreeNode *node = q.front(); q.pop();
+                if(node->left) q.push(node->left);
+                if(node->right) q.push(node->right);
+            }
+            depth++;
+        }
+        return depth;
+    }
+};
+
+class Solution78 {
+public:
+    bool isSameTree(TreeNode* p, TreeNode* q) {
+        if (!p && !q) return true;       // 都空:相同
+        if (!p || !q) return false;      // 一空一非空:不同
+        return p->val == q->val
+            && isSameTree(p->left, q->left)
+            && isSameTree(p->right, q->right);
+    }
+    bool _isSameTree(TreeNode* p, TreeNode* q) {
+        std::queue<TreeNode*> q1, q2;
+        q1.push(p);
+        q2.push(q);
+        while (!q1.empty()) {
+            TreeNode* node1 = q1.front(); q1.pop();
+            TreeNode* node2 = q2.front(); q2.pop();
+            if (!node1 && !node2) continue;         // 都空,这对没问题,看下一对
+            if (!node1 || !node2) return false;     // 一空一非空,结构不同
+            if (node1->val != node2->val) return false;
+            q1.push(node1->left);  q2.push(node2->left);
+            q1.push(node1->right); q2.push(node2->right);
+        }
+        return true;
+    }
+};
+
+class Solution79 {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if(root==nullptr) return nullptr;
+        TreeNode* cur = root->left;
+        root->left = root->right;
+        root->right = cur;
+        invertTree(root->left);
+        invertTree(root->right);
+        return root;
+    }
+};
+
+class Solution80 {
+public:
+    bool isSymmetric(TreeNode* root) {
+        return check(root->left, root->right);
+    }
+private:
+    bool check(TreeNode *left, TreeNode *right){
+        if(!left && !right) return true; // 节点都为空，返回true
+        if(!left || !right) return false; // 一个节点为空
+        return left->val == right->val 
+        && check(left->left, right->right) 
+        && check(left->right, right->left);
+    }
+};
