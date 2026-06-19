@@ -2155,3 +2155,37 @@ private:
         && check(left->right, right->left);
     }
 };
+
+class Solution81 {
+public:
+    int largestAltitude(vector<int>& gain) {
+        int ans = 0, sum = 0;
+        for (int x: gain) {
+            sum += x;
+            ans = max(ans, sum);
+        }
+        return ans;
+    }
+};
+
+class Solution82 {
+    unordered_map<int, int> pos;  // 值 -> 在 inorder 中的下标
+    vector<int> pre, in;
+
+    TreeNode* build(int preL, int preR, int inL, int inR) {
+        if (preL > preR) return nullptr;
+        int rootVal = pre[preL];
+        TreeNode* root = new TreeNode(rootVal);
+        int k = pos[rootVal];          // 根在 inorder 中的位置
+        int leftSize = k - inL;        // 左子树的节点数
+        root->left  = build(preL + 1, preL + leftSize, inL, k - 1);
+        root->right = build(preL + leftSize + 1, preR, k + 1, inR);
+        return root;
+    }
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        pre = preorder; in = inorder;
+        for (int i = 0; i < in.size(); i++) pos[in[i]] = i;
+        return build(0, pre.size() - 1, 0, in.size() - 1);
+    }
+};
