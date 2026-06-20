@@ -2189,3 +2189,113 @@ public:
         return build(0, pre.size() - 1, 0, in.size() - 1);
     }
 };
+
+class Solution83 {
+public:
+    int maxBuilding(int n, vector<vector<int>>& restrictions) {
+        restrictions.push_back({1, 0});
+        sort(restrictions.begin(), restrictions.end());
+        // 末尾的 n 号楼没有上限,但为了统一处理可不加(它会被左侧约束)
+        int m = restrictions.size();
+
+        // 更新限制点高度
+        // 从左到右传播
+        for (int i = 1; i < m; i++) {
+            int d = restrictions[i][0] - restrictions[i-1][0];
+            restrictions[i][1] = min(restrictions[i][1], restrictions[i-1][1] + d);
+        }
+        // 从右到左传播
+        for (int i = m - 2; i >= 0; i--) {
+            int d = restrictions[i+1][0] - restrictions[i][0];
+            restrictions[i][1] = min(restrictions[i][1], restrictions[i+1][1] + d);
+        }
+
+        int ans = 0;
+        // 相邻限制点之间求峰值
+        for (int i = 1; i < m; i++) {
+            int l = restrictions[i-1][0], hl = restrictions[i-1][1];
+            int r = restrictions[i][0],   hr = restrictions[i][1];
+            int d = r - l;
+            int peak = (hl + hr + d) / 2;
+            ans = max(ans, peak);
+        }
+        // 最后一个限制点到 n 号楼:右侧无约束,可一路往上爬
+        int lastId = restrictions[m-1][0], lastH = restrictions[m-1][1];
+        ans = max(ans, lastH + (n - lastId));
+
+        return ans;
+    }
+};
+
+class Solution84 {
+    std::unordered_map<int, int> pos; // 值->inorder下标
+    std::vector<int> in, post; 
+
+    TreeNode* build(int inL, int inR, int postL, int postR){
+        if(postL > postR) return nullptr; // 区间不存在
+        int rootVal = post[postR];
+        TreeNode *root = new TreeNode(rootVal);
+        int k = pos[rootVal];           // 根在中序数组中的位置
+        int leftSize = k - inL;         // 左子树节点数
+        root->left = build(inL, k - 1, postL, postL + leftSize - 1);
+        root->right = build(k + 1, inR, postL + leftSize, postR - 1);
+        return root;
+    }
+public:
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        in = inorder;
+        post = postorder;
+        for(int i=0; i<inorder.size(); ++i) pos[inorder[i]] = i;
+        return build(0, in.size() - 1, 0, post.size() - 1);
+    }
+};
+
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+    Node* next;
+
+    Node() : val(0), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val) : val(_val), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val, Node* _left, Node* _right, Node* _next)
+        : val(_val), left(_left), right(_right), next(_next) {}
+};
+
+class Solution85 {
+public:
+    Node* connect(Node* root) {
+        Node* cur = root;
+        while (cur) {
+            Node dummy(0);          // 哑节点,作为下一层链表的"假头"
+            Node* tail = &dummy;    // 尾指针,逐个挂上下一层的节点
+            while (cur) {
+                if (cur->left)  { tail->next = cur->left;  tail = tail->next; }
+                if (cur->right) { tail->next = cur->right; tail = tail->next; }
+                cur = cur->next;
+            }
+            cur = dummy.next;       // 下一层的真正头节点
+        }
+        return root;
+    }
+
+    Node* _connect(Node* root) {
+        if(!root) return nullptr;
+        std::queue<Node*> q;
+        q.push(root);
+        while(!q.empty()){
+            int sz = q.size();
+            while(sz--){
+                Node *front = q.front(); q.pop();
+                if(sz == 0) front->next = nullptr;
+                else front->next = q.front();
+                if(front->left) q.push(front->left);
+                if(front->right) q.push(front->right);
+            }
+        }
+        return root;
+    }
+};
