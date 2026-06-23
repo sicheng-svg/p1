@@ -2341,3 +2341,5 @@ public:
         return *min_element(cnt.begin(), cnt.end());
     }
 };
+
+// ready for exam
