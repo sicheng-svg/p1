@@ -2343,3 +2343,45 @@ public:
 };
 
 // ready for exam
+
+class Solution89 {
+public:
+    void flatten(TreeNode* root) {
+        std::function<void(TreeNode*, TreeNode*&)> dfs = [&](TreeNode* root, TreeNode*& prev){
+            if(root == nullptr) return;
+            dfs(root->right, prev);
+            dfs(root->left, prev);
+            root->right = prev;
+            root->left = nullptr;
+            prev = root; 
+        };
+        TreeNode *prev = nullptr;
+        dfs(root, prev);
+    }
+    
+};
+
+class Solution90 {
+public:
+    bool hasPathSum(TreeNode* root, int targetSum) {
+        if(root == nullptr) return false;
+        if(root->left == nullptr && root->right == nullptr)
+            return root->val == targetSum;
+        return hasPathSum(root->left, targetSum-root->val)
+        || hasPathSum(root->right, targetSum-root->val);
+    }
+};
+
+class Solution91 {
+public:
+    int dfs(TreeNode* root, int cur){
+        if(root == nullptr) return 0;
+        cur = cur*10 + root->val;
+        if(root->left == nullptr && root->right == nullptr)
+            return cur;
+        return dfs(root->left, cur) + dfs(root->right, cur);
+    }
+    int sumNumbers(TreeNode* root) {
+        return dfs(root, 0);
+    }
+};
