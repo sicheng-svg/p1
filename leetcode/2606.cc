@@ -2385,3 +2385,88 @@ public:
         return dfs(root, 0);
     }
 };
+
+class Solution92 {
+public:
+    int maximumElementAfterDecrementingAndRearranging(vector<int>& arr) {
+        sort(arr.begin(), arr.end());
+        arr[0] = 1;
+        for(int i=1; i<arr.size(); ++i){
+            arr[i] = std::min(arr[i-1] + 1, arr[i]);
+        }
+        return arr[arr.size()-1];
+    }
+};
+
+class Solution93 {
+public:
+    int ans = INT_MIN;
+    int dfs(TreeNode* root){
+        if(root == nullptr) return 0;
+        int left = std::max(dfs(root->left), 0);
+        int right = std::max(dfs(root->right), 0);
+        ans = std::max(ans, root->val + left + right);
+
+        return root->val + std::max(left, right);
+    }
+    int maxPathSum(TreeNode* root) {    
+        dfs(root);
+        return ans;
+    }
+};
+
+class BSTIterator94 {
+    std::stack<TreeNode*> st;
+    void pushLeft(TreeNode* node){
+        while(node != nullptr){
+            st.push(node);
+            node = node->left;
+        }
+    }
+public:
+    BSTIterator(TreeNode* root) {
+        pushLeft(root);
+    }
+    
+    int next() {
+        TreeNode* node = st.top(); st.pop();
+        pushLeft(node->right);
+        return node->val;
+    }
+    
+    bool hasNext() {
+        return !st.empty();
+    }
+};
+
+class Solution95 {
+public:
+    int _countNodes(TreeNode* root) {
+        if(root == nullptr) return 0;
+        int ans = 0;
+        std::queue<TreeNode*> q;
+        q.push(root);
+        while(!q.empty()){
+            TreeNode* node = q.front(); q.pop();
+            if(node->left) q.push(node->left);
+            if(node->right) q.push(node->right);
+            ans++;
+        }
+        return ans;
+    }
+    int __countNodes(TreeNode* root) {
+        if(root == nullptr) return 0;
+        return 1 + countNodes(root->left) + countNodes(root->right);
+    }
+    int countNodes(TreeNode* root){
+        if (root == nullptr) return 0;
+        int lh = 0, rh = 0;
+        TreeNode* l = root;
+        TreeNode* r = root;
+        while (l) { lh++; l = l->left; }    // 最左链高度
+        while (r) { rh++; r = r->right; }   // 最右链高度
+        if (lh == rh) return (1 << lh) - 1; // 满树，公式直接算
+        // 否则递归左右子树
+        return 1 + countNodes(root->left) + countNodes(root->right);
+    }
+};
