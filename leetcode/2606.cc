@@ -2470,3 +2470,55 @@ public:
         return 1 + countNodes(root->left) + countNodes(root->right);
     }
 };
+
+long long largestLessThanN(vector<int>& A, long long n) {
+    sort(A.begin(), A.end());
+    A.erase(unique(A.begin(), A.end()), A.end());  // 去重，避免重复元素干扰
+    string s = to_string(n);
+    int len = s.size();
+    int maxD = A.back();
+    set<int> inA(A.begin(), A.end());
+
+    auto biggestLess = [&](int d) {        // A 中 < d 的最大值，没有返回 -1
+        int best = -1;
+        for (int x : A) if (x < d) best = x;
+        return best;
+    };
+
+    string best = "";
+    // 情况一：同位数，枚举降位点 i（从右往左，越靠右结果越大）
+    for (int i = len - 1; i >= 0; --i) {
+        bool prefixOK = true;              // 0..i-1 必须都能等于 n 的对应位
+        for (int j = 0; j < i; ++j)
+            if (!inA.count(s[j] - '0')) { prefixOK = false; break; }
+        if (!prefixOK) continue;
+        int d = biggestLess(s[i] - '0');  // 降位点填 < n[i] 的最大数
+        if (d < 0) continue;
+        string cand = s.substr(0, i);     // 前缀贴 n
+        cand += char('0' + d);            // 降位
+        cand += string(len - 1 - i, char('0' + maxD));  // 后面填最大
+        best = cand;
+        break;                            // 第一个可行的即同位数最优
+    }
+
+    // 情况二：少一位，全填最大数字（注意最大数字不能是 0，否则是前导零）
+    if (len > 1 && maxD > 0) {
+        string shorter(len - 1, char('0' + maxD));
+        if (best.empty() || stoll(shorter) > stoll(best))
+            best = shorter;
+    }
+
+    return best.empty() ? -1 : stoll(best);
+}
+
+int main() {
+    long long n;
+    cin >> n;
+    int m;
+    cin >> m;
+    vector<int> A(m);
+    for (int i = 0; i < m; ++i) cin >> A[i];
+
+    cout << largestLessThanN(A, n) << endl;
+    return 0;
+}
