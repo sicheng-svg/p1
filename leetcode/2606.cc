@@ -2522,3 +2522,162 @@ int main() {
     cout << largestLessThanN(A, n) << endl;
     return 0;
 }
+
+class Solution {
+public:
+    // 判断s2是不是s1的子串
+    int isSubString(const std::string& s1, const std::string& s2){
+        int m = s1.size(), n = s2.size();
+        if(m < n) return 0;
+        // 从起始位置开始比较，一直往后走，直到s1为空，或者匹配/不匹配
+        for(int i=0; i+n<=m; ++i){
+            bool flag = true;
+            for(int j=0; j<n; ++j){
+                if(s1[i+j] != s2[j]){
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag) return 1;
+        }
+        return 0;
+    }
+    int numOfStrings(vector<string>& patterns, string word) {
+        // 暴力匹配，每个字符串都和word进行比较
+        int ans = 0;
+        for(const auto& pattern: patterns){
+            ans += isSubString(word, pattern);
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        // 递归终止：空节点，或找到了 p / q
+        if (root == nullptr || root == p || root == q) return root;
+        // 在左右子树里分别查找
+        TreeNode* left  = lowestCommonAncestor(root->left, p, q);
+        TreeNode* right = lowestCommonAncestor(root->right, p, q);
+        // 左右都找到 → 当前节点就是 LCA
+        if (left && right) return root;
+        // 只有一侧找到 → 把那侧结果往上传
+        return left ? left : right;
+    }
+};
+
+class Solution {
+public:
+    int numberOfSubstrings(string s) {
+        int n = s.size();
+        int cnt[3] = {0, 0, 0};
+        int left = 0;
+        long long ans = 0;
+        for (int right = 0; right < n; ++right) {
+            cnt[s[right] - 'a']++;
+            // 窗口含三种字符时，尽量收缩左边界
+            while (cnt[0] && cnt[1] && cnt[2]) {
+                cnt[s[left] - 'a']--;
+                left++;
+            }
+            // 收缩后，[0, left-1] 都是合法起点，共 left 个
+            ans += left;
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    vector<int> rightSideView(TreeNode* root) {
+        if(!root) return {};
+        std::queue<TreeNode*> q;
+        std::vector<int> ans;
+        q.push(root);
+
+        while(!q.empty()){
+            int sz = q.size();
+            while(sz--){
+                TreeNode* node = q.front();q.pop();
+                if(node->left) q.push(node->left);
+                if(node->right) q.push(node->right);
+                if(sz == 0){
+                    ans.push_back(node->val);
+                }
+            }
+        }
+        return ans;
+    }
+};
+
+
+class Solution {
+public:
+    vector<double> averageOfLevels(TreeNode* root) {
+        std::queue<TreeNode*> q;
+        q.push(root);
+        std::vector<double> ans;
+        while(!q.empty()){
+            int sz = q.size();
+            double sum = 0;
+            for(int i=0; i<sz; ++i){
+                TreeNode* node = q.front(); q.pop();
+                if(node->left) q.push(node->left);
+                if(node->right) q.push(node->right);
+                sum += node->val;
+            }
+            ans.push_back(sum/sz);
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        if(root == nullptr) return {};
+        std::queue<TreeNode*> q;
+        q.push(root);
+        std::vector<std::vector<int>> ans;
+        while(!q.empty()){
+            int sz = q.size();
+            std::vector<int> tmp;
+            while(sz--){
+                TreeNode* node = q.front();q.pop();
+                tmp.push_back(node->val);
+                if(node->left) q.push(node->left);
+                if(node->right) q.push(node->right);
+            }
+            ans.push_back(tmp);
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+        if(root == nullptr) return {};
+        std::vector<std::vector<int>> ans;
+        std::queue<TreeNode*> q;
+        q.push(root);
+        int i = 1;
+        while(!q.empty()){
+            int sz = q.size();
+            std::vector<int> tmp;
+            while(sz--){
+                TreeNode* node = q.front(); q.pop();
+                tmp.push_back(node->val);
+                if(node->left) q.push(node->left);
+                if(node->right) q.push(node->right);
+            }
+            if(i % 2 == 0){
+                std::reverse(tmp.begin(), tmp.end());
+            }
+            ans.push_back(tmp);
+            i++;
+        }
+        return ans;
+    }
+};
