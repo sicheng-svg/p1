@@ -260,3 +260,212 @@ public:
         return left;
     }
 };
+
+
+class Solution9 {
+public:
+    vector<vector<int>> shiftGrid(vector<vector<int>>& grid, int k) {
+        int m = grid.size(), n = grid[0].size();
+        k %= m*n;
+
+        std::vector<std::vector<int>> next(m, std::vector<int>(n));
+        for(int i=0; i<m; ++i){
+            for(int j=0; j<n; ++j){
+                int idx = i*n + j;
+                int nid = (idx + k) % (m*n);
+                next[nid/n][nid%n] = grid[i][j];
+            }
+        }
+        return next;
+    }
+};
+
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    vector<Node*> neighbors;
+    Node() {
+        val = 0;
+        neighbors = vector<Node*>();
+    }
+    Node(int _val) {
+        val = _val;
+        neighbors = vector<Node*>();
+    }
+    Node(int _val, vector<Node*> _neighbors) {
+        val = _val;
+        neighbors = _neighbors;
+    }
+};
+*/
+
+class Solution {
+public:
+    std::unordered_map<Node*, Node*> map;
+    // dfs
+    Node* _cloneGraph(Node* node) {
+        if(!node) return nullptr;
+        if(map.count(node)) return map[node];
+        Node* clone = new Node(node->val);
+        map[node] = clone;
+        for(Node* neighbor : node->neighbors){
+            clone->neighbors.push_back(cloneGraph(neighbor));
+        }
+        return clone;
+    }
+    // bfs
+    Node* cloneGraph(Node* node){
+        if(!node) return nullptr;
+        std::unordered_map<Node*, Node*> map;
+        map[node] = new Node(node->val);
+        std::queue<Node*> q;
+        q.push(node);
+
+        while(!q.empty()){
+            Node* cur = q.front(); q.pop();
+            for(auto nb: cur->neighbors){
+                if(!map.count(nb)){
+                    map[nb] = new Node(nb->val);
+                    q.push(nb);
+                }
+                map[cur]->neighbors.push_back(map[nb]);
+            }
+        }
+        return map[node];
+    }
+};
+
+
+class Solution {
+public:
+    vector<double> calcEquation(vector<vector<string>>& equations, 
+                                vector<double>& values, 
+                                vector<vector<string>>& queries) {
+        // 1. 建图，题目给出的两个已知数组，表示的就是一副有向带权图
+        std::unordered_map<std::string, std::vector<std::pair<std::string, double>>> graph;
+        for(int i=0; i<equations.size(); ++i){
+            graph[equations[i][0]].push_back({equations[i][1], values[i]});
+            graph[equations[i][1]].push_back({equations[i][0], 1.0 / values[i]}); // 反向，权重为倒数
+        }
+
+        // 2. dfs 查找问题对应的节点
+        function<double(string&, string&, double, unordered_set<string>&)> dfs = 
+        [&](string& cur, string& target, double prod, unordered_set<string>& vis) -> double {
+            if (cur == target) return prod;        // 找到了
+            vis.insert(cur);
+            for (auto& [nb, w] : graph[cur]) {
+                if (vis.count(nb)) continue;       // 防止走回头路
+                double res = dfs(nb, target, prod * w, vis);
+                if (res > 0) return res;           // 找到就直接返回
+            }
+            return -1.0;
+        };
+
+        vector<double> ans;
+        for (auto& q : queries) {
+            string a = q[0], b = q[1];
+            // 变量没出现过 → -1.0
+            if (!graph.count(a) || !graph.count(b)) {ans.push_back(-1.0); continue; }
+            unordered_set<string> vis;
+            ans.push_back(dfs(a, b, 1.0, vis));
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    // 思路：建图+统计入度，一个课程的入度为0表示它不需要前置条件就可以直接学习
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        std::vector<std::vector<int>> graph(numCourses);
+        std::vector<int> indegree(numCourses, 0);
+        for(auto& classes : prerequisites){
+            int a = classes[0], b = classes[1]; // a依赖b
+            graph[b].push_back(a); // b->a
+            indegree[a]++;
+        }
+        std::queue<int> q;
+        for(int i=0; i<numCourses; ++i)
+            if(indegree[i] == 0) 
+                q.push(i);
+
+        int taken = 0;
+        while(!q.empty()){
+            auto a = q.front(); q.pop();
+            taken++; // 学完一门课
+            for(int classes: graph[a]){
+                if(--indegree[classes] == 0) q.push(classes);
+            }
+        }
+        return taken == numCourses;
+    }
+};
+
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        std::vector<std::vector<int>> graph(numCourses);
+        std::vector<int> indegree(numCourses, 0);
+        for(auto& classes : prerequisites){
+            int a = classes[0], b = classes[1]; // a依赖b
+            graph[b].push_back(a); // b->a
+            indegree[a]++;
+        }
+        std::queue<int> q;
+        for(int i=0; i<numCourses; ++i)
+            if(indegree[i] == 0) 
+                q.push(i);
+
+        std::vector<int> order;
+        while(!q.empty()){
+            auto a = q.front(); q.pop();
+            order.push_back(a);
+            for(int classes: graph[a]){
+                if(--indegree[classes] == 0) q.push(classes);
+            }
+        }
+        return order.size() < numCourses ? std::vector<int>() : order;
+    }
+};
+
+class Solution {
+public:
+    int snakesAndLadders(vector<vector<int>>& board) {
+        int n = board.size();
+        // 编号 -> 坐标
+        auto num2Rc = [&](int num) -> std::pair<int, int>{
+            int idx = num - 1;              // 转换为0~based
+            int rowInfront = idx / n;       // 整数第几行
+            int r = n - 1 - rowInfront;     // 转换为真正的行号
+            int offset = idx % n;           // 行内偏移，列号
+            int c = (rowInfront % 2 == 0) ? offset : (n - 1 - offset);//列表S型排列，需要根据奇偶决定列号
+            return {r, c};
+        };
+
+        // 初始化，从编号1开始进行bfs
+        // 用vis记录防止重复访问，第一次走到target就是最短路径
+        int target = n*n;
+        std::queue<std::pair<int, int>> q; // {编号，步数}
+        vector<bool> vis(target + 1, false);
+        q.push({1, 0});
+        vis[1] = true;
+
+        while(!q.empty()){
+            auto [num, step] = q.front(); q.pop();
+            if(num == target) return step;
+            for(int i=1; i<=6; ++i){ // 投骰子，有6种可能
+                int nxt = num + i;
+                if(nxt > target) break;
+                auto [r, c] = num2Rc(nxt);
+                if(board[r][c] != -1) nxt = board[r][c];
+                if(!vis[nxt]){
+                    vis[nxt] = true;
+                    q.push({nxt, step + 1});
+                }
+            }
+        }
+        return -1;
+    }
+};
