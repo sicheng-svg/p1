@@ -469,3 +469,187 @@ public:
         return -1;
     }
 };
+
+class Solution {
+public:
+    int maxActiveSectionsAfterTrade(string s) {
+        int n = s.size();
+        int ones = count(s.begin(), s.end(), '1'); // 字符串中1的个数
+        std::vector<int> zeros;
+        int i = 0;
+        while(i<n){
+            int j = i;
+            while(j < n && s[j] == s[i]) j++;
+            if(s[i] == '0') zeros.push_back(j-i);
+            i = j;
+        }
+
+        int gain = 0;
+        for(int k = 1; k<zeros.size(); ++k){
+            gain = std::max(gain, zeros[k]+zeros[k-1]);
+        }
+        return gain + ones;
+    }
+};
+
+class Solution {
+public:
+    char type[4] = {'A', 'C', 'G', 'T'};
+    std::unordered_set<std::string> visited;
+    int minMutation(string startGene, string endGene, vector<string>& bank) {
+        // 将基因库中的基因存储在哈希表中，便于查找
+        std::unordered_set<std::string> st(bank.begin(), bank.end());
+        std::queue<std::string> q;
+        q.push(startGene);
+        visited.insert(startGene);
+
+        int step = 0;
+        while(!q.empty()){
+            int sz = q.size();
+            step++;
+            while(sz--){
+                std::string& gene = q.front(); q.pop();
+                // 将当前基因的每一位都进行4次变化，如果变化后在bank中，则存放在队列中
+                for(int i=0; i<8; ++i){
+                    std::string copy = gene;
+                    for(int j=0; j<4; ++j){
+                        copy[i] = type[j];
+                        if(!st.count(copy) || visited.count(copy)) continue;
+                        if(copy == endGene) return step;
+                        q.push(copy);
+                        visited.insert(copy);
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+};
+
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+        std::unordered_set<std::string> st(wordList.begin(), wordList.end());
+        if(!st.count(endWord)) return 0; // endWord不在字典中
+        std::unordered_set<std::string> visited;
+        std::queue<std::string> q;
+        q.push(beginWord);
+        visited.insert(beginWord);
+
+        int step = 1;
+        while(!q.empty()){
+            int sz = q.size();
+            step++;
+            while(sz--){
+                // 将字符串的每个元素都进行26次变换，判断那些变换是正确的
+                auto word = q.front(); q.pop();
+                for(int i=0; i<word.size(); ++i){
+                        std::string tmp = word;
+                    for(char ch='a'; ch<='z'; ++ch){
+                        tmp[i] = ch;
+                        if(!st.count(tmp) || visited.count(tmp)) continue;
+                        if(tmp == endWord) return step;
+                        q.push(tmp);
+                        visited.insert(tmp);
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+};
+
+class Trie {
+public:
+    Trie() :root(new Node){}
+    
+    void insert(string word) {
+        Node* cur = root;
+        for(char ch: word){
+            int c = ch - 'a';
+            if(!cur->children[c]) cur->children[c] = new Node;
+            cur = cur->children[c];
+        }
+        cur->isEnd = true;
+    }
+    
+    bool search(string word) {
+        Node* node = find(word);
+        return node != nullptr && node->isEnd;
+    }
+    
+    bool startsWith(string prefix) {
+        return find(prefix) != nullptr;
+    }
+private:
+    struct Node{
+        Node* children[26] = {};
+        bool isEnd = false;
+    };
+
+    Node* find(const std::string& word){
+        Node* cur = root;
+        for(char ch: word){
+            int c = ch - 'a';
+            if(!cur->children[c]) return nullptr; // 在字典树中找不到当前字符
+            cur = cur->children[c];
+        }
+        return cur;
+    }
+
+    Node* root;
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
+
+ class WordDictionary {
+private:
+    struct Node {
+        Node* children[26] = {};
+        bool isEnd = false;
+    };
+    Node* root;
+
+    bool dfs(Node* node, const string& word, int idx) {
+        // 情况一：字符全匹配完 → 看当前节点是不是单词结尾
+        if (idx == word.size()) return node->isEnd;
+
+        char ch = word[idx];
+        if (ch == '.') {
+            // 情况三：通配符 → 遍历所有非空子节点，任一成功即成功
+            for (int c = 0; c < 26; ++c) {
+                if (!node->children[c]) continue;
+                if (dfs(node->children[c], word, idx + 1)) return true;
+            }
+            return false;                     // 全部失败
+        } else {
+            // 情况二：普通字母 → 只有唯一一条路
+            int c = ch - 'a';
+            if (!node->children[c]) return false;
+            return dfs(node->children[c], word, idx + 1);
+        }
+    }
+
+public:
+    WordDictionary() { root = new Node(); }
+
+    void addWord(string word) {              // 和 208 完全一样
+        Node* cur = root;
+        for (char ch : word) {
+            int c = ch - 'a';
+            if (!cur->children[c]) cur->children[c] = new Node();
+            cur = cur->children[c];
+        }
+        cur->isEnd = true;
+    }
+
+    bool search(string word) {
+        return dfs(root, word, 0);
+    }
+};
