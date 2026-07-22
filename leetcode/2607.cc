@@ -653,3 +653,188 @@ public:
         return dfs(root, word, 0);
     }
 };
+
+class Solution {
+public:
+    int maxActiveSectionsAfterTrade(string s) {
+        int n = s.size();
+        int ones = count(s.begin(), s.end(), '1'); // 字符串中1的个数
+        std::vector<int> zeros;
+        int i = 0;
+        while(i<n){
+            int j = i;
+            while(j < n && s[j] == s[i]) j++;
+            if(s[i] == '0') zeros.push_back(j-i);
+            i = j;
+        }
+
+        int gain = 0;
+        for(int k = 1; k<zeros.size(); ++k){
+            gain = std::max(gain, zeros[k]+zeros[k-1]);
+        }
+        return gain + ones;
+    }
+};
+
+class Solution {
+public:
+    // 题目要求，只对子串进行变换，但是最后统计的是整个字符串s的个数
+    vector<int> maxActiveSectionsAfterTrade(string s, vector<vector<int>>& queries) {
+        std::vector<int> ans;
+        int ones = count(s.begin(), s.end(), '1');
+
+        // 对每个子区间，分别进行查询
+        for(auto& query: queries){
+            
+
+            std::vector<int> zeros;
+            // 将子区间进行划分
+            int i = query[0];
+            while(i <= query[1]){
+                int j = i;
+                while(j<=query[1] && s[i]==s[j]) j++;
+                if(s[i] == '0') zeros.push_back(j-i);
+                i=j;
+            }
+            int gains = 0;
+            for(int k=1; k<zeros.size(); ++k){
+                gains = std::max(gains, zeros[k]+zeros[k-1]);
+            }
+            ans.push_back(gains+ones);
+        }
+        return ans;
+    }
+};
+
+class Solution {
+    struct Node{
+        Node* children[26] = {};
+        std::string word; // 非空表示这是单词结束，即isEnd = true;
+    };
+
+    void insert(Node* root, const std::string& w){
+        Node* cur = root;
+        for(auto ch: w){
+            int c = ch - 'a';
+            if(!cur->children[c]) cur->children[c] = new Node();
+            cur = cur->children[c];
+        }
+        cur->word = w;
+    }
+
+    void dfs(vector<vector<char>>& board, int i, int j, Node* node, vector<string>& ans){
+        char ch = board[i][j];
+        if(ch == '#') return; // 该字母当前路径已经访问过了
+        Node* nxt = node->children[ch-'a'];
+        if(!nxt) return; // 剪枝，没有这个前缀
+
+        if(!nxt->word.empty()){ // word不为空，说明这是一个单词的结尾，保存，并清空，防止重复添加。
+            ans.push_back(nxt->word);
+            nxt->word.clear();
+        }
+
+        board[i][j] = '#'; // 标记已访问
+        int m = board.size(), n = board[0].size();
+        int dx[4] = {1, -1, 0, 0}, dy[4] = {0, 0, 1, -1};
+        for(int d=0; d<4; ++d){
+            int x = i + dx[d], y = j + dy[d];
+            if(x >= 0 && x < m && y >= 0 && y < n){
+                dfs(board, x, y, nxt, ans);
+            }
+        }
+        board[i][j] = ch; // 回溯，还原现场
+    }
+public:
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        Node* root = new Node();
+        for(auto& word: words) insert(root, word);
+
+        std::vector<std::string> ans;
+        for(int i=0; i<board.size(); ++i)
+            for(int j=0; j<board[0].size(); ++j)
+                dfs(board, i, j, root, ans);
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    // 准备阶段，先将下标与字符串对应起来
+    // dfs，用path来记录当前组合，当idx == digits时，表示一次正常组合。
+    // 本质上就是先固定一个位置，然后选择下一个位置，然后回溯，换一个字母
+    vector<string> letterCombinations(string digits) {
+        if(digits.empty()) return {};
+
+        std::unordered_map<int, std::string> mp{
+            {'2', "abc"}, {'3', "def"}, {'4', "ghi"}, {'5', "jkl"},
+            {'6', "mno"}, {'7', "pqrs"}, {'8', "tuv"}, {'9', "wxyz"}
+        };
+
+        std::vector<std::string> ans;
+        std::string path;
+
+        std::function<void(int)> dfs = [&](int idx){
+            if(idx == digits.size()){
+                ans.push_back(path);
+                return;
+            }
+
+            string letter = mp[digits[idx]];
+            for(char ch: letter){
+                path.push_back(ch);
+                dfs(idx+1);
+                path.pop_back();
+            }
+        };
+
+        dfs(0);
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> combine(int n, int k) {
+        std::vector<std::vector<int>> ans;
+        std::vector<int> path;
+
+        std::function<void(int, int, int)> dfs = [&](int n, int k, int pos){
+            if(path.size() == k){
+                ans.push_back(path);
+                return;
+            }
+
+            for(int i=pos; i<=n; ++i){
+                path.push_back(i);
+                dfs(n, k, i+1);
+                path.pop_back();
+            }
+        };
+
+        dfs(n, k, 1);
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        std::vector<std::vector<int>> ans;
+
+        std::function<void(std::vector<int>, int)> dfs = [&](std::vector<int> nums, int pos){
+            if(pos == nums.size() - 1){
+                ans.push_back(nums);
+                return;
+            }
+
+            for(int i=pos; i<nums.size(); ++i){
+                std::swap(nums[i], nums[pos]);
+                dfs(nums, pos+1);
+                std::swap(nums[i], nums[pos]);
+            }
+        };
+
+        dfs(nums, 0);
+        return ans;
+    }
+};
