@@ -850,3 +850,57 @@ public:
         return ans;
     }
 };
+
+class Solution {
+public:
+    int ans = 0;
+    vector<bool> cols;
+    vector<bool> diag1;
+    vector<bool> diag2;
+
+    void dfs(int row, int n)
+    {
+        if(row == n){
+            ans++;
+            return;
+        }
+
+        for(int col = 0; col < n; col++) {
+            // 当前列已有皇后
+            if(cols[col]) continue;
+
+            // 主对角线冲突
+            if(diag1[row - col + n]) continue;
+
+            // 副对角线冲突
+            if(diag2[row + col]) continue;
+
+            // 放置皇后
+            cols[col] = true;
+            diag1[row - col + n] = true;
+            diag2[row + col] = true;
+            dfs(row + 1, n);
+
+            // 回溯
+            cols[col] = false;
+            diag1[row - col + n] = false;
+            diag2[row + col] = false;
+        }
+    }
+
+    int totalNQueens(int n)
+    {
+        cols.resize(n, false);
+
+        // row-col 范围:
+        // -(n-1) ~ n-1
+        diag1.resize(2*n, false);
+
+        // row+col 范围:
+        // 0 ~ 2n-2
+        diag2.resize(2*n, false);
+
+        dfs(0, n);
+        return ans;
+    }
+};
