@@ -904,3 +904,296 @@ public:
         return ans;
     }
 };
+
+class Solution {
+public:
+    int maxProduct(int n) {
+        int first = 0, second = 0;
+        while(n > 0){
+            int x = n % 10;
+            if(x > first){
+                second = first;
+                first = x;
+            }else if(x > second){
+                second = x;
+            }
+            n /= 10;
+        }
+        return first * second;
+    }
+};
+
+
+class Solution {
+public:
+    // 括号生成，本质上就是在2*n个位置上选择放什么。
+    // 但不是让你随便放，要求就是能组合成合法的括号序列。
+    // 通过两条规则来限定合法字符串：
+    //      1. 当left < n 时，就可以继续放左括号
+    //      2. 当right < left 时，就可以继续放右括号；当right >= left 时，如果在放右括号就会出现)(
+    vector<string> generateParenthesis(int n) {
+        std::vector<std::string> ans;
+        std::string path;
+        function<void(int, int)> dfs = [&](int left, int right){
+            if(path.size() == 2* n){
+                ans.push_back(path);
+                return;
+            }
+            if(left < n){
+                path.push_back('(');
+                dfs(left+1, right);
+                path.pop_back();
+            }
+            if(right < left){
+                path.push_back(')');
+                dfs(left, right+1);
+                path.pop_back();
+            }
+        };
+
+        dfs(0, 0);
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    bool exist(vector<vector<char>>& board, string word) {
+        int m = board.size(), n = board[0].size();
+        int dx[4] = {0, 0, 1, -1}, dy[4] = {1, -1, 0, 0};
+        std::function<bool(int, int, int)> dfs = [&](int i, int j, int idx){
+            char ch = board[i][j];
+            if(ch != word[idx]) return false;
+            if(idx == word.size()-1) return true;
+
+            board[i][j] = '#'; // 标记已访问
+            for(int k=0; k<4; ++k){
+                int x = i + dx[k], y = j + dy[k];
+                if(x>=0 && x<m && y>=0 && y<n && board[x][y] != '#')
+                    if(dfs(x, y, idx+1)) return true;
+            }
+            board[i][j] = ch;
+            return false;
+        };
+
+        for(int i=0; i<m; ++i){
+            for(int j=0; j<n; ++j){
+                if(dfs(i, j, 0)) return true;
+            }
+        }
+        return false;
+    }
+};
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+    TreeNode* build(vector<int> nums, int left, int right){
+        if(left > right) return nullptr;
+        int mid = left + (right-left)/2;
+        TreeNode* root = new TreeNode(nums[mid]);
+        root->left = build(nums, left, mid-1);
+        root->right = build(nums, mid+1, right);
+        return root;
+    }
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return build(nums, 0, nums.size()-1);
+    }
+};
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+    ListNode* merge(ListNode* l1, ListNode* l2){
+        ListNode dummy;
+        ListNode* tail = &dummy;
+        while(l1 && l2){
+            if(l1->val <= l2->val) {
+                tail->next = l1;
+                l1 = l1->next;
+            }else {
+                tail->next = l2;
+                l2 = l2->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = l1 ? l1 : l2;
+        return dummy.next;
+    }
+public:
+    // 解法2：题目要求不使用额外空间，并且时间复杂度为O(nlogn)
+    // 考虑归并排序，归并排序，本质上就是将数组划分为小数组，让小数组有序，随后合并小数组，这样就可以使整体有序
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        ListNode* fast = head->next, *slow = head; // fast先走一步，就会让slow停在偏左
+        while(fast && fast->next){
+            fast = fast->next->next;
+            slow = slow->next;
+        }
+        ListNode* mid = slow->next;
+        slow->next = nullptr; // 断开左右两部分
+        ListNode* left = sortList(head);
+        ListNode* right = sortList(mid);
+        return merge(left, right);
+    }
+
+    // 解法1：利用额外数组将链表数据存储，排序后顺序恢复到链表中
+    ListNode* _sortList(ListNode* head) {
+        std::vector<int> nums;
+        ListNode* cur = head;
+        while(cur){
+            nums.push_back(cur->val);
+            cur = cur->next;
+        }
+        sort(nums.begin(), nums.end());
+        cur = head;
+        for(int i=0; i<nums.size(); ++i){
+            cur->val = nums[i];
+            cur = cur->next;
+        }
+        return head;
+    }
+};
+
+/*
+// Definition for a QuadTree node.
+class Node {
+public:
+    bool val;
+    bool isLeaf;
+    Node* topLeft;
+    Node* topRight;
+    Node* bottomLeft;
+    Node* bottomRight;
+    
+    Node() {
+        val = false;
+        isLeaf = false;
+        topLeft = NULL;
+        topRight = NULL;
+        bottomLeft = NULL;
+        bottomRight = NULL;
+    }
+    
+    Node(bool _val, bool _isLeaf) {
+        val = _val;
+        isLeaf = _isLeaf;
+        topLeft = NULL;
+        topRight = NULL;
+        bottomLeft = NULL;
+        bottomRight = NULL;
+    }
+    
+    Node(bool _val, bool _isLeaf, Node* _topLeft, Node* _topRight, Node* _bottomLeft, Node* _bottomRight) {
+        val = _val;
+        isLeaf = _isLeaf;
+        topLeft = _topLeft;
+        topRight = _topRight;
+        bottomLeft = _bottomLeft;
+        bottomRight = _bottomRight;
+    }
+};
+*/
+
+class Solution {
+    Node* build(const std::vector<std::vector<int>>& grid, int r, int c, int len){
+        bool same = true;
+        for(int i=r; i<r+len && same; ++i)
+            for(int j=c; j<c+len; ++j)
+                if(grid[i][j] != grid[r][c]) 
+                    {same=false;break;}
+
+        if(same) 
+            return new Node(grid[r][c] == 1, true);
+
+        int half = len/2; // 矩阵不同一，将其分块
+        return new Node(
+            true,
+            false,
+            build(grid, r, c, half),
+            build(grid, r, c+half, half),
+            build(grid, r+half, c, half),
+            build(grid, r+half, c+half, half)
+        );
+    }
+public:
+    Node* construct(vector<vector<int>>& grid) {
+        return build(grid, 0, 0, grid[0].size());
+    }
+};
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+    ListNode* mergeLists(ListNode* l1, ListNode* l2){
+        ListNode dummy, *tail = &dummy;
+        while(l1 && l2){
+            if(l1->val <= l2->val){
+                tail->next = l1;
+                l1 = l1->next;
+            }else{
+                tail->next = l2;
+                l2 = l2->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = l1 ? l1 : l2;
+        return dummy.next;
+    }
+public:
+    // 解法1：合并k个，两个两个合并，用前两个合并的结果和下一个继续合并
+    ListNode* _mergeKLists(vector<ListNode*>& lists) {
+        int n = lists.size();
+        if(n == 0) return nullptr;
+        if(n == 1) return lists[0];
+        ListNode* ans = lists[0];
+        for(int i=1; i<n; ++i){
+            ans = mergeLists(ans, lists[i]);
+        }
+        return ans;
+    }
+
+    // 解法二：借助优先级队列，先将每个链表的头放进去，依次拿出最小的，拿出的同时将其的next放进队列
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        auto comp = [](ListNode* l1, ListNode* l2){
+            return l1->val > l2->val;
+        };
+        std::priority_queue<ListNode*, std::vector<ListNode*>, decltype(comp)> q;
+        for(auto node: lists) if(node) q.push(node);
+
+        ListNode dummy, *tail = &dummy;
+        while(!q.empty()){
+            auto node = q.top(); q.pop();
+            tail->next = node;
+            tail = tail->next;
+            if(node->next) q.push(node->next);
+        }
+        return dummy.next;
+    }
+};
