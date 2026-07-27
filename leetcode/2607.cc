@@ -1197,3 +1197,128 @@ public:
         return dummy.next;
     }
 };
+
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        int first = 0, second = 0;
+        for(int n: nums){
+            if(n > first){
+                second = first;
+                first = n;
+            }else if(n > second){
+                second = n;
+            }
+        }
+        return (first-1)*(second-1);
+    }
+};
+
+class Solution {
+public:
+    int _maxSubArray(vector<int>& nums) {
+        // dp[i]表示以i结尾的最大子数组的和
+        // dp[i] = std::max(dp[i-1]+nums[i], nums[i])
+        int n = nums.size();
+        std::vector<int> dp(n, 0);
+        dp[0] = nums[0];
+        int ans = nums[0];
+        for(int i=1; i<nums.size(); ++i){
+            dp[i] = std::max(dp[i-1] + nums[i], nums[i]);
+            ans = std::max(ans, dp[i]);
+        }
+        return ans;
+    }
+
+    // 利用滚动数组，优化空间
+    int maxSubArray(vector<int>& nums) {
+        // dp[i]表示以i结尾的最大子数组的和
+        // dp[i] = std::max(dp[i-1]+nums[i], nums[i])
+        int n = nums.size();
+        int q = nums[0], p = nums[0];
+        int ans = nums[0];
+        for(int i=1; i<nums.size(); ++i){
+            p = std::max(p + nums[i], nums[i]);
+            ans = std::max(ans, p);
+        }
+        return ans;
+    }
+};
+
+
+class Solution {
+public:
+    int maxSubarraySumCircular(vector<int>& nums) {
+        int total = 0;
+        int curMax = 0, maxSum = nums[0];
+        int curMin = 0, minSum = nums[0];
+        for(int n: nums){
+            total += n;
+            curMax = std::max(curMax + n, n);
+            maxSum = std::max(maxSum, curMax);
+            curMin = std::min(curMin + n, n);
+            minSum = std::min(minSum, curMin);
+        }
+        if (minSum == total) return maxSum;
+        return std::max(maxSum, total-minSum);
+    }
+};
+
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        int left = 0, right = nums.size()-1;
+        while(left <= right){
+            int mid = left + (right-left)/2;
+            if(nums[mid] > target) right = mid-1;
+            else if(nums[mid] < target) left = mid+1;
+            else return mid;
+        }
+        return right+1;
+    }
+};
+
+class Solution {
+public:
+    // 将矩阵转化为一维数组，从左到右递增
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int m = matrix.size(), n = matrix[0].size();
+        int left = 0, right = m*n - 1;
+        while(left <= right){
+            int mid = left + (right-left)/2;
+            // 将一维坐标转化为二维坐标
+            int x = mid / n, y = mid % n;
+            if(matrix[x][y] > target) right = mid - 1;
+            else if(matrix[x][y] < target) left = mid + 1;
+            else return true;
+        }
+        return false;
+    }
+};
+
+class Solution {
+public:
+    int _findPeakElement(vector<int>& nums) {
+        int n = nums.size();
+        if(n == 1) return 0;
+        if(n == 2) return nums[0] > nums[1] ? 0 : 1;
+        if(nums[1] < nums[0]) return 0;
+        if(nums[n-1] > nums[n-2]) return n-1;
+
+        for(int i=1; i<n-1; ++i){
+            if(nums[i] > nums[i-1] && nums[i] > nums[i+1]) return i;
+        }
+        return -1;
+    }
+
+    int findPeakElement(vector<int>& nums) {
+        int left = 0, right = nums.size() - 1;
+        while(left < right){
+            int mid = left + (right - left) / 2;
+            if(nums[mid] < nums[mid+1]) left = mid + 1;
+            else right = mid;
+        }:w
+
+        return left;
+    }
+};
