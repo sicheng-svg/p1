@@ -1322,3 +1322,44 @@ public:
         return left;
     }
 };
+
+class Solution {
+public:
+    string smallestPalindrome(string s) {
+        // 要求将整个字符串变为最短的回文串
+        // 所以，对整个序列来说，最多只有一个字符是奇数
+        // 统计字符个数，然后按字典序依次取出每个字符的一半，然后判断是否有中间字符
+        // 另一半和前半段对称。
+        int cnt[26] = {0};
+        for(char c: s) cnt[c-'a']++;
+
+        std::string half = "", mid = "";
+        for(int i=0; i<26; ++i){
+            if(cnt[i] % 2) mid = std::string(1, 'a' + i); // 奇数取一个放在中间
+            half += std::string(cnt[i]/2, 'a'+i);
+        }
+        std::string back = half;
+        std::reverse(back.begin(), back.end());
+        return half + mid + back;
+    }
+};
+
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int left = 0, right = nums.size()-1;
+        while(left <= right){
+            int mid = left + (right-left)/2;
+            if(nums[mid] == target) return mid;
+
+            if(nums[left] <= nums[mid]){// 左半有序
+                if(nums[left] <= target && target < nums[mid]) right = mid - 1;
+                else left = mid + 1;
+            }else{
+                if(nums[mid] < target && target <= nums[right]) left = mid + 1;
+                else right = mid - 1;
+            }
+        }
+        return -1;
+    }
+};
