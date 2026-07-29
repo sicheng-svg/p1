@@ -1363,3 +1363,169 @@ public:
         return -1;
     }
 };
+
+
+class Solution {
+public:
+    // 多重集排列数，超过 limit 返回 limit+1
+    long long countPerm(int cnt[26], long long limit) {
+        long long total = 0;
+        for (int i = 0; i < 26; ++i) total += cnt[i];
+        long long res = 1;
+        for (int i = 0; i < 26; ++i) {
+            if (cnt[i] == 0) continue;
+            for (int j = 1; j <= cnt[i]; ++j) {
+                res = res * (total - cnt[i] + j) / j;
+                if (res > limit) return limit + 1;
+            }
+            total -= cnt[i];
+        }
+        return res;
+    }
+
+    string smallestPalindrome(string s, int k) {
+        // 1. 统计字符个数
+        int cnt[26] = {0};
+        for (char c : s) cnt[c - 'a']++;
+
+        // 分离出中间字符和前半段的字符计数
+        string mid;
+        int half[26] = {0};
+        for (int i = 0; i < 26; ++i) {
+            if (cnt[i] % 2) mid = string(1, 'a' + i);
+            half[i] = cnt[i] / 2;
+        }
+
+        int halfLen = 0;
+        for (int i = 0; i < 26; ++i) halfLen += half[i];
+
+        // 总排列数不足 k → 无解
+        if (countPerm(half, k) < k) return "";
+
+        // 逐位确定前半段
+        string res;
+        long long kk = k;
+        for (int pos = 0; pos < halfLen; ++pos) {
+            for (int c = 0; c < 26; ++c) {
+                if (half[c] == 0) continue;
+                half[c]--;                              // 假设这位放 c
+                long long ways = countPerm(half, kk);   // 剩余能组成多少排列
+                if (kk <= ways) {                        // 答案在这一批里
+                    res += ('a' + c);
+                    break;                               // 确定这位，进入下一位
+                }
+                kk -= ways;                              // 跳过这一批
+                half[c]++;                               // 撤销假设
+            }
+        }
+
+        string rev = res;
+        reverse(rev.begin(), rev.end());
+        return res + mid + rev;
+    }
+};
+
+class Solution {
+public:
+    // 排序后返回第k-1个
+    int _findKthLargest(vector<int>& nums, int k) {
+        std::sort(nums.begin(), nums.end(), std::greater<int>());
+        return nums[k-1];
+    }
+
+    // 要求时间复杂度为O(N)，又要求第K大，这正是堆的用处
+    // 使用向下调整算法，建一个大堆，进行k次调整
+    // 从第一个非叶子节点开始向下调整
+    void adjustDown(std::vector<int>& nums, int parent, int size){
+        int val = nums[parent];
+
+        int child = 2*parent + 1;// 左孩子
+        while(child < size){
+            if(child+1 < size && nums[child+1] > nums[child]) child += 1;
+            if(val >= nums[child]) break;
+            nums[parent] = nums[child];
+            parent = child;
+            child = parent * 2 + 1;
+        }
+        nums[parent] = val;
+    }
+    int __findKthLargest(vector<int>& nums, int k) {
+        int n = nums.size();
+        for(int i=(n-1-1)/2; i>=0; --i){
+            adjustDown(nums, i, n);
+        }
+
+        int end = n - 1;
+        int i = k;
+        while(i--){
+            std::swap(nums[0], nums[end]);
+            adjustDown(nums, 0, end);
+            end--;
+        }
+        return nums[n-k];
+    }
+
+
+    int findKthLargest(vector<int>& nums, int k) {
+        int n = nums.size();
+        return quickSelect(nums, 0, n-1, n-k);
+    }
+
+    int quickSelect(std::vector<int>& nums, int left, int right, int target){
+        if(left == right) return nums[left];
+
+        int p = left + rand() % (right - left + 1);   // ① 范围修正
+        std::swap(nums[right], nums[p]);               // ② 换到末尾
+        int pivot = nums[right];
+
+        int i = left;
+        for(int j = left; j < right; ++j){             // ③ 循环变量全用 j
+            if(nums[j] < pivot) std::swap(nums[i++], nums[j]);
+        }
+        std::swap(nums[i], nums[right]);               // pivot 归位
+
+        if(i == target) return nums[i];
+        if(i < target) return quickSelect(nums, i+1, right, target);  // ④ 方向修正
+        return quickSelect(nums, left, i-1, target);
+    }
+
+};
+
+
+class Solution {
+public:
+    int findMaximizedCapital(int k, int w, vector<int>& profits, vector<int>& capital) {
+        int n = profits.size();
+        std::vector<std::pair<int, int>> proj(n);
+        for(int i=0; i<n; ++i) proj[i] = {capital[i], profits[i]};
+        std::sort(proj.begin(), proj.end());
+
+        std::priority_queue<int> pq; // 大堆
+        int idx = 0;
+        for(int t=0; t<k; ++t){
+            while(idx < n && proj[idx].first <= w) pq.push(proj[idx++].second);
+            if(pq.empty()) break;
+            w += pq.top(); pq.pop();
+        }
+        return w;
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2, int k) {
+        int m = nums1.size(), n = nums2.size();
+        std::priority_queue<std::tuple<int, int, int>, 
+                            std::vector<std::tuple<int, int, int>>,
+                            std::greater<>> pq;
+        for(int i=0; i<min(m, k); ++i) pq.emplace(nums1[i] + nums2[0], i, 0);
+
+        std::vector<std::vector<int>> ans;
+        while(k-- && !pq.empty()){
+            auto [sum, i, j] = pq.top(); pq.pop();
+            ans.push_back({nums1[i], nums2[j]});
+            if(j + 1 < n) pq.emplace(nums1[i] + nums2[j+1], i, j+1);
+        }
+        return ans;
+    }
+};
