@@ -1529,3 +1529,133 @@ public:
         return ans;
     }
 };
+
+class Solution {
+public:
+    int minimumPushes(string word) {
+        int n = word.size();
+        
+        int ans = 0;
+        if(n <= 8) ans = n;
+        else if(n > 8 && n <= 16) ans = 8 + (n-8)*2;
+        else if(n > 16 && n <= 24) ans = 8 + 8*2 + (n-16)*3;
+        else ans = 8 + 8*2 + 8*3 + (n-24)  *4;
+        return ans;
+    }
+};
+
+class MedianFinder {
+public:
+    MedianFinder() {}
+    
+    void addNum(int num) {
+        // 1.无脑进small
+        small.push(num);
+        // 2. 将small的堆顶，推进large
+        large.push(small.top());
+        small.pop();
+        // 3. 判断是否满足数量关系，保证small比large多一个
+        if(small.size() < large.size()){
+            small.push(large.top());
+            large.pop();
+        }
+    }
+    
+    double findMedian() {
+        if(small.size() == large.size()) return (small.top() + large.top()) / 2.0;
+        return small.top();
+    }
+private:
+    std::priority_queue<int> small; // 大堆
+    std::priority_queue<int, std::vector<int>, std::greater<>> large;
+};
+
+/**
+ * Your MedianFinder object will be instantiated and called as such:
+ * MedianFinder* obj = new MedianFinder();
+ * obj->addNum(num);
+ * double param_2 = obj->findMedian();
+ */
+
+ class Solution {
+public:
+    string addBinary(string a, string b) {
+        // 1. 相加时要末尾对齐，反转后从头开始
+        std::reverse(a.begin(), a.end());
+        std::reverse(b.begin(), b.end());
+
+        std::string ans;
+        int carry = 0;
+        int i=0, j=0;
+        while(i < a.size() || j < b.size() || carry){
+            int ai = i < a.size() ? a[i]-'0' : 0;
+            int bi = j < b.size() ? b[j]-'0' : 0;
+            int sum = ai + bi + carry;
+            ans.push_back(sum%2 + '0');
+            carry = sum / 2;
+            i++;j++;
+        }
+        std::reverse(ans.begin(), ans.end());
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    uint32_t reverseBits(uint32_t n) {
+        uint32_t ans = 0;
+        for (int i = 0; i < 32; ++i) {
+            ans <<= 1;          // 结果左移，腾出最低位
+            ans |= (n & 1);     // 把 n 的最低位塞进来
+            n >>= 1;            // n 右移，下一位就位
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    int hammingWeight(int n) {
+        int ans = 0;
+        while(n){
+            ans += n & 1;
+            n >>= 1;
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int ans = 0;
+        for(int n: nums) ans ^= n;
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int ans = 0;
+        for(int i=0; i<32; ++i){
+            int cnt = 0;
+            for(int x: nums) cnt += (x>>i) & 1; // 统计第i位上有多少个1
+            if(cnt % 3) ans |= (1 << i); // %3不为0，说明答案的第i位上是1
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    int rangeBitwiseAnd(int left, int right) {
+        int shift = 0;
+        while (left < right) {        // 不相等就继续右移
+            left >>= 1;
+            right >>= 1;
+            shift++;
+        }
+        return left << shift;          // 公共前缀左移回原位
+    }
+};
