@@ -1659,3 +1659,66 @@ public:
         return left << shift;          // 公共前缀左移回原位
     }
 };
+
+class Solution {
+public:
+    int minimumPushes(string word) {
+        std::vector<int> cnt(26, 0);
+        for (char ch : word) cnt[ch - 'a']++;
+
+        // 按频率降序排序
+        std::sort(cnt.begin(), cnt.end(), std::greater<int>());
+
+        int ans = 0;
+        for (int i = 0; i < 26; ++i) {
+            if (cnt[i] == 0) break;          // 后面都是0，提前结束
+            ans += cnt[i] * (i / 8 + 1);     // 第i个字母需按 i/8+1 次
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        if(x < 0) return false;
+        std::string s = std::to_string(x);
+        int i = 0, j = s.size() - 1;
+        while(i <= j && s[i] == s[j]){
+            i++;
+            j--;
+        }
+        if(i > j) return true;
+        return false;
+    }
+};
+
+class Solution {
+public:
+    vector<int> plusOne(vector<int>& digits) {
+        std::reverse(digits.begin(), digits.end());
+        digits[0] += 1;
+        int carry = digits[0] / 10;
+        digits[0] %= 10;
+        for(int i=1; i<digits.size() && carry; ++i){
+            digits[i] += carry;
+            carry = digits[i] / 10;
+            digits[i] %= 10;
+        }
+        if(carry) digits.push_back(carry);
+        std::reverse(digits.begin(), digits.end());
+        return digits;
+    }
+};
+
+class Solution {
+public:
+    int trailingZeroes(int n) {
+        int ans = 0;
+        while (n > 0) {
+            n /= 5;        // 每轮除以5，累加商
+            ans += n;
+        }
+        return ans;
+    }
+};
