@@ -57,3 +57,102 @@ public:
         return ans;
     }
 };
+
+func stoneGame(piles []int) bool {
+    n := len(piles)
+    dp := make([][]int, n)
+    for i := range dp{
+        dp[i] = make([]int, n)
+        dp[i][i] = piles[i]
+    }
+    
+    for length := 2; length <= n; length++{
+            for i := 0; i + length - 1 < n; i++{
+                j := i + length - 1
+                dp[i][j] = max(piles[i] - dp[i+1][j], piles[j] - dp[i][j-1])
+            }
+    }
+    return dp[0][n-1] > 0
+}
+
+class Solution {
+public:
+    int maxPoints(vector<vector<int>>& points) {
+        int n = points.size();
+        if (n <= 2) return n;
+
+        int ans = 1;
+        for (int i = 0; i < n; ++i) {                 // 枚举锚点
+            unordered_map<long long, int> cnt;
+            for (int j = 0; j < n; ++j) {
+                if (i == j) continue;
+                int dx = points[j][0] - points[i][0];
+                int dy = points[j][1] - points[i][1];
+
+                int g = __gcd(abs(dx), abs(dy));      // 约分成最简
+                dx /= g; dy /= g;
+                // 统一符号：dx>0，或 dx==0 时 dy>0
+                if (dx < 0 || (dx == 0 && dy < 0)) { dx = -dx; dy = -dy; }
+
+                long long key = 1LL * dx * 100000 + dy;
+                ans = max(ans, ++cnt[key] + 1);       // +1 是算上锚点自己
+            }
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    // dp[i] 表示以i结尾一共有多少种方法
+    // dp[i] = dp[i-1] + dp[i-2]
+    int climbStairs(int n) {
+        std::vector<int> dp(n+1);
+        dp[0] = 1;
+        dp[1] = 1;
+        for(int i=2; i<=n; ++i){
+            dp[i] = dp[i-1] + dp[i-2];
+        }
+        return dp[n];
+    }
+};
+
+class Solution {
+public:
+    // dp[i]表示到第i间的总现金
+    // dp[i] = std::max(dp[i-2] + nums[i], dp[i-1])
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        if(n == 1) return nums[0];
+
+        std::vector<int> dp(n);
+        dp[0] = nums[0];
+        dp[1] = std::max(nums[0], nums[1]);
+        for(int i=2; i<n; ++i){
+            dp[i] = std::max(dp[i-2] + nums[i], dp[i-1]);
+        }
+        return dp[n-1];
+    }
+};
+
+class Solution {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        std::unordered_set<std::string> hash(wordDict.begin(), wordDict.end());
+        int n = s.size();
+        std::vector<bool> dp(n+1, false);
+        dp[0] = true;
+        
+        for(int i=1; i<=n; ++i){
+            for(int j=0; j<i; ++j){
+                if(dp[j] && hash.find(s.substr(j, i-j)) != hash.end()){
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        return dp[n];
+    }
+    // dp[i]表示前i个字符
+    // dp[i] = dp[j] == true?
+};
