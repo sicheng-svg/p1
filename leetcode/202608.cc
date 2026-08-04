@@ -156,3 +156,105 @@ public:
     // dp[i]表示前i个字符
     // dp[i] = dp[j] == true?
 };
+
+class Solution {
+public:
+    vector<int> findMissingElements(vector<int>& nums) {
+        std::sort(nums.begin(), nums.end());
+        std::unordered_set<int> s(nums.begin(), nums.end());
+        std::vector<int> ans;
+        int i = nums[0] + 1;
+        while(i < nums.back()){
+            if(!s.count(i)) ans.push_back(i);
+            i++;
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    // dp[i]表示凑出金额i所需要的最小的硬币数
+    
+    int coinChange(vector<int>& coins, int amount) {
+        std::vector<int> dp(amount+1, amount+1);
+        dp[0] = 0;
+        for(int i=1; i<=amount; ++i){
+            for(int coin : coins){
+                if (i>=coin)
+                    dp[i] = std::min(dp[i], dp[i-coin] + 1);
+            }
+        }
+        return dp[amount] != amount+1 ? dp[amount] : -1;
+    }
+};
+
+class Solution {
+public:
+    // dp[i]表示以nums[i]结尾的最长严格递增子数组
+    // dp[i] = max(dp[j] + 1) dp[j]  0 ~ i-1
+    int lengthOfLIS(vector<int>& nums) {
+        int n = nums.size();
+        vector<int> dp(n, 1);              // 每个元素自成长度1
+        int ans = 1;
+
+        for (int i = 1; i < n; ++i) {
+            for (int j = 0; j < i; ++j) {   // 回看所有更早的位置
+                if (nums[j] < nums[i])       // 能接上（严格递增）
+                    dp[i] = max(dp[i], dp[j] + 1);
+            }
+            ans = max(ans, dp[i]);           // 答案是全局最大，不是dp[n-1]
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    // dp[i][j]表示从i，j出发，到达最底的最小路径和
+    int minimumTotal(vector<vector<int>>& triangle) {
+        int n = triangle.size();    
+        std::vector<std::vector<int>> dp(n, std::vector<int>(n, 0));
+        
+        for(int j=0; j<n; ++j) dp[n-1][j] = triangle[n-1][j];
+        for(int i=n-2; i>=0; --i){
+            for(int j=0; j<=i; ++j){
+                dp[i][j] = std::min(dp[i+1][j], dp[i+1][j+1]) + triangle[i][j];
+            }
+        }
+        return dp[0][0];
+    }
+};
+
+class Solution {
+public:
+    // dp[i][j]表示达到nums[i][j]时的最小路径和
+    // dp[i][j] = std::min(dp[i][j-1], dp[i-1][j]) + nums[i][j]
+    int minPathSum(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();      // 行、列分开
+        const int INF = 1e9;
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1, INF));  // padding填INF
+        dp[0][1] = 0;                                  // 起点旁开个口子
+
+        for (int i = 1; i <= m; ++i)
+            for (int j = 1; j <= n; ++j)
+                dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i-1][j-1];
+
+        return dp[m][n];
+    }
+};
+
+class Solution {
+public:
+    // dp[i][j]表示走到grid[i-1][j-1]时的不同路径数
+    // dp[i][j] = dp[i-1][j] + dp[i][j-1]
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+        int m = obstacleGrid.size(), n = obstacleGrid[0].size();
+        std::vector<std::vector<int>> dp(m+1, std::vector<int>(n+1, 0));
+        dp[0][1] = 1;
+        for(int i=1; i<=m; ++i)
+            for(int j=1; j<=n; ++j)
+                dp[i][j] = obstacleGrid[i-1][j-1] != 1 ? dp[i-1][j] + dp[i][j-1] : 0;
+        return dp[m][n];
+    }
+};
