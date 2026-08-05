@@ -258,3 +258,95 @@ public:
         return dp[m][n];
     }
 };
+
+class Solution {
+public:
+    vector<int> remainingMethods(int n, int k, vector<vector<int>>& invocations) {
+        // 建邻接表
+        vector<vector<int>> g(n);
+        for (auto& e : invocations)
+            g[e[0]].push_back(e[1]);
+
+        // 第一步：BFS标记所有可疑方法（k及其直接/间接调用的）
+        vector<bool> suspicious(n, false);
+        queue<int> q;
+        q.push(k);
+        suspicious[k] = true;
+        while (!q.empty()) {
+            int u = q.front(); q.pop();
+            for (int v : g[u]) {
+                if (!suspicious[v]) {      // 去重，防止环导致死循环
+                    suspicious[v] = true;
+                    q.push(v);
+                }
+            }
+        }
+
+        // 第二步：检查是否有"非可疑 → 可疑"的调用
+        for (auto& e : invocations) {
+            if (!suspicious[e[0]] && suspicious[e[1]]) {
+                // 无法移除，返回全部方法
+                vector<int> all(n);
+                iota(all.begin(), all.end(), 0);
+                return all;
+            }
+        }
+
+        // 第三步：可以移除，返回所有非可疑方法
+        vector<int> ans;
+        for (int i = 0; i < n; ++i)
+            if (!suspicious[i]) ans.push_back(i);
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    string _longestPalindrome(string s) {
+        // 中心扩展算法，从中心开始向两边进行扩展
+        // 要包含奇数 + 偶数
+        int n = s.size();
+        int start = 0, maxLen = 1;
+        auto expand = [&](int l, int r) -> int {
+            while(l >= 0 && r < n && s[l] == s[r]){
+                l--; r++;
+            }
+            return r - l - 1;
+        };
+
+        for(int i=0; i<n; ++i){
+            int len1 = expand(i, i); // 奇数
+            int len2 = expand(i, i+1); // 偶数
+            int len = max(len1, len2);
+            if(len > maxLen){
+                maxLen = len;
+                start = i - (len - 1) / 2;
+            }
+        }
+        return s.substr(start, maxLen);
+    }
+    string longestPalindrome(string s) {
+        // 动态规划
+        // dp[i][j] 表示区间ij是否是回文串
+        // dp[i][j] = dp[i+1][j-1] && s[i] == s[j]
+        int n = s.size();
+        int start = 0, maxLen = 1;
+
+        std::vector<std::vector<bool>> dp(n, std::vector<bool>(n, false));
+        for(int i=0; i<n; ++i) dp[i][i] = true; // 长度为1肯定是回文串
+
+        for(int len=2; len<=n; ++len){
+            for(int i=0; i+len-1<n; ++i){
+                int j = i+len-1;
+                if(s[i] != s[j]) continue;
+                if(len == 2) dp[i][j] = true;
+                else dp[i][j] = dp[i+1][j-1];
+                if(dp[i][j] && len > maxLen){
+                    maxLen = len;
+                    start = i; 
+                }
+            }
+        }
+        return s.substr(start, maxLen);
+    }
+};
