@@ -350,3 +350,75 @@ public:
         return s.substr(start, maxLen);
     }
 };
+
+class Solution {
+public:
+    int smallestNumber(int n, int t) {
+        auto getMul = [](int n) ->int{
+            int ans = 1;
+            while(n){
+                ans *= n%10;
+                n /= 10;
+            }
+            return ans;
+        };
+
+        int ans = n;
+        while(1){
+            if(getMul(ans) % t == 0) break;
+            ans++;
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    bool isInterleave(string s1, string s2, string s3) {
+        int m = s1.size(), n = s2.size();
+        if (m + n != (int)s3.size()) return false;      // 长度对不上，直接false
+
+        vector<vector<bool>> dp(m + 1, vector<bool>(n + 1, false));
+        dp[0][0] = true;
+
+        // 第一列：只用s1
+        for (int i = 1; i <= m; ++i)
+            dp[i][0] = dp[i-1][0] && s1[i-1] == s3[i-1];
+        // 第一行：只用s2
+        for (int j = 1; j <= n; ++j)
+            dp[0][j] = dp[0][j-1] && s2[j-1] == s3[j-1];
+
+        for (int i = 1; i <= m; ++i)
+            for (int j = 1; j <= n; ++j)
+                dp[i][j] = (dp[i-1][j] && s1[i-1] == s3[i+j-1])   // 这一位来自s1
+                        || (dp[i][j-1] && s2[j-1] == s3[i+j-1]);  // 或来自s2
+
+        return dp[m][n];
+    }
+};
+
+class Solution {
+public:
+    // dp[i][j] 表示把 word1 的前 i 个字符转换成 word2 的前 j 个字符的最少操作数
+    int minDistance(string word1, string word2) {
+        int n = word1.size(), m = word2.size();
+        vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));   // n+1 行 m+1 列
+
+        dp[0][0] = 0;
+        for (int j = 1; j <= m; ++j) dp[0][j] = j;   // 空串→前j个：插入j次
+        for (int i = 1; i <= n; ++i) dp[i][0] = i;   // 前i个→空串：删除i次
+
+        for (int i = 1; i <= n; ++i) {
+            for (int j = 1; j <= m; ++j) {
+                if (word1[i-1] == word2[j-1])
+                    dp[i][j] = dp[i-1][j-1];         // 字符相同，白嫖
+                else
+                    dp[i][j] = min({dp[i-1][j],      // 删除
+                                    dp[i][j-1],      // 插入
+                                    dp[i-1][j-1]})   // 替换
+                             + 1;
+            }
+        }
+        return dp[n][m];
+    }
+};
