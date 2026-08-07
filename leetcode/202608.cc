@@ -422,3 +422,61 @@ public:
         return dp[n][m];
     }
 };
+
+class Solution {
+public:
+    // 状态dp，对于每一天来说，有5种状态：什么也没干，买了第一支，卖了，买了第二支，买了
+    // 每一天都要维护这5种状态
+    int _maxProfit(vector<int>& prices) {
+        int n = prices.size();
+       std::vector<std::vector<int>> dp(n, std::vector<int>(5)); 
+       dp[0][0] = 0; // 什么也不干
+       dp[0][1] = -prices[0]; // 持第一笔股
+       dp[0][2] = 0; // 卖掉
+       dp[0][3] = -prices[0]; // 持第二笔股
+       dp[0][4] = 0; // 卖掉
+       for(int i=1; i<n; ++i) { 
+           dp[i][0] = dp[i-1][0];
+           dp[i][1] = std::max(dp[i-1][1], dp[i-1][0] - prices[i]);
+           dp[i][2] = std::max(dp[i-1][2], dp[i-1][1] + prices[i]);
+           dp[i][3] = std::max(dp[i-1][3], dp[i-1][2] - prices[i]);
+           dp[i][4] = std::max(dp[i-1][4], dp[i-1][3] + prices[i]);
+       }
+        return std::max({dp[n-1][0], dp[n-1][2], dp[n-1][4]});
+    }
+
+    // 滚动数组
+    int maxProfit(vector<int>& prices) {
+        int n = prices.size();
+        int buy1 = -prices[0], sell1 = 0;
+        int buy2 = -prices[0], sell2 = 0;
+        for(int i=1; i<n; ++i) { 
+            buy1 = std::max(buy1, -prices[i]);
+            sell1 = std::max(sell1, buy1 + prices[i]);
+            buy2 = std::max(buy2, sell1 - prices[i]);
+            sell2 = std::max(sell2, buy2 + prices[i]);
+        }
+        return sell2;
+    }
+};
+
+class Solution {
+public:
+    // buy[j] 手上拿到底j次股票，现在的余额
+    // sell[j] 卖出第j次股票，现在的余额
+    int maxProfit(int k, vector<int>& prices) {
+        int n = prices.size();
+        k = std::min(k, n/2);
+        std::vector<int> buy(k+1, -prices[0]);
+        std::vector<int> sell(k+1, 0);
+        for(int i=1; i<n; ++i){
+            int price = prices[i];
+            for(int j=1; j<=k; ++j){
+                buy[j] = std::max(buy[j], sell[j-1] - price);
+                sell[j] = std::max(sell[j], buy[j] + price);
+            }
+        }
+        return sell[k];
+    }
+};
+
