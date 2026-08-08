@@ -480,3 +480,55 @@ public:
     }
 };
 
+class Solution {
+public:
+    vector<int> validSequence(string word1, string word2) {
+        int n = word1.size(), m = word2.size();
+        // 1. 预处理suf数组，suf[i]表示word1[i~n-1]可以匹配word2的几个字符
+        std::vector<int> suf(n+1, 0);
+        int j = m - 1;
+        for(int i=n-1; i>=0; --i){
+            if(j >= 0 && word1[i] == word2[j]) --j;
+            suf[i] = m - 1 - j;
+        }
+
+        // 2. 从word1开始依次匹配word2的字符，如果相同，记录下来。
+        // 不相同，则要判断是否需要换，要换的话，需要判断后面的字符能不能凑出word2的后面字符
+        std::vector<int> ans;
+        j = 0;
+        bool isChanged = false;
+        for(int i=0; i<n && j<m; ++i){
+            if(word1[i] == word2[j]){
+                ans.push_back(i);
+                j++;
+            }else if(!isChanged && suf[i+1] >= m - 1 - j){
+                isChanged = true;
+                ans.push_back(i);
+                j++;
+            }
+        }
+        return j == m ? ans : std::vector<int>();
+    }
+};
+
+class Solution {
+public:
+    // 用一个栈来记录前几天的问题，保证前一天肯定在最上面。
+    // 然后遍历后面的温度，如果栈不为空，且当前温度，大于前一天的温度，那么比前一天大的就是今天
+    // 而且，要一直判断，因为这天可能也是前面几天的答案。
+    vector<int> dailyTemperatures(vector<int>& temperatures) {
+        int n = temperatures.size();
+        std::vector<int> ans(n, 0);
+        std::stack<int> st;
+
+        for(int i=0; i<n; ++i){
+            while(!st.empty() && temperatures[i] > temperatures[st.top()]){
+                int idx = st.top();st.pop();
+                ans[idx] = i-idx;
+            }
+            st.push(i);
+        }
+        return ans;
+    }
+};
+
