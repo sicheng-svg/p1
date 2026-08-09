@@ -532,3 +532,28 @@ public:
     }
 };
 
+class Solution {
+public:
+    int stoneGameII(vector<int>& piles) {
+        int n = piles.size();
+        vector<int> suf(n + 1, 0);
+        for (int i = n - 1; i >= 0; --i) suf[i] = suf[i+1] + piles[i];
+
+        // dp[i][m]: 从第i堆开始、M=m 时，当前玩家能拿的最大石子数
+        vector<vector<int>> dp(n + 1, vector<int>(n + 1, 0));
+
+        for (int i = n - 1; i >= 0; --i) {
+            for (int m = 1; m <= n; ++m) {
+                if (i + 2 * m >= n) {              // 能一次全拿走
+                    dp[i][m] = suf[i];
+                    continue;
+                }
+                for (int X = 1; X <= 2 * m; ++X)   // 枚举取几堆
+                    dp[i][m] = max(dp[i][m],
+                                   suf[i] - dp[i + X][max(m, X)]);
+            }
+        }
+        return dp[0][1];
+    }
+};
+
