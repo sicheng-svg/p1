@@ -571,3 +571,64 @@ public:
         return dp[n];
     }
 };
+
+class Solution {
+public:
+    int missingInteger(vector<int>& nums) {
+        int i = 1, n = nums.size();
+        int sum = nums[0];
+        while(i < n && nums[i] == nums[i-1] + 1){
+            sum += nums[i];
+            i++;
+        }
+        std::unordered_set<int> mp(nums.begin(), nums.end());
+        while(mp.count(sum)) sum++;
+        return sum;
+    }
+};
+
+class Solution {
+public:
+    vector<int> nextGreaterElements(vector<int>& nums) {
+        int n = nums.size();
+        std::vector<int> ans(n, -1);
+        std::stack<int> st;
+
+        for(int i=0; i<2*n; ++i){
+            int cur = nums[i%n];
+            while(!st.empty() && nums[st.top()] < cur){
+                ans[st.top()] = cur;
+                st.pop();
+            }
+            if(i < n) st.push(i);
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        int maxArea = 0;
+        heights.push_back(0);
+        int n = heights.size();
+
+
+        std::stack<int> stk;
+        for(int i=0; i<n; ++i){
+            while(!stk.empty() && heights[stk.top()] > heights[i]){
+                int cur = stk.top(); stk.pop();  
+                int left = stk.empty() ? -1 : stk.top();
+                maxArea = std::max(maxArea, (i-left-1)*heights[cur]);
+            }
+            stk.push(i);
+        }
+        return maxArea;
+    }
+};
+// 对于每一个高度的柱子来说，分别找到左边和右边第一个比它矮的柱子，两个柱子之间就是该高度柱子所能围成的最大面积
+// 然后对每一个柱子都进行该操作，返回最大的面积即可
+// 重点就落在了如何找到左右第一个比它矮的柱子：借助单调栈，不一定要按照顺序计算高度，而是按照弹出的顺序。
+// 栈为空 || 栈顶元素 < 当前元素，入栈
+// 栈不为空 && 栈顶元素 > 当前元素，说明，以栈顶元素为高的柱子，右边第一个比他小的就是i
+// 弹栈后，下一个栈顶，就是第一个比柱子小的左边柱子。因为如果大于的话，就会先把它处理了。
