@@ -632,3 +632,51 @@ public:
 // 栈为空 || 栈顶元素 < 当前元素，入栈
 // 栈不为空 && 栈顶元素 > 当前元素，说明，以栈顶元素为高的柱子，右边第一个比他小的就是i
 // 弹栈后，下一个栈顶，就是第一个比柱子小的左边柱子。因为如果大于的话，就会先把它处理了。
+
+class Solution {
+public:
+    int maxSubarrayLength(vector<int>& nums, int k) {
+        std::unordered_map<int, int> cnt;
+        int left = 0, right = 0;
+        int n = nums.size();
+        int ans = 1;
+        while(right < n){
+            // 进窗口
+            cnt[nums[right]]++;
+            while(cnt[nums[right]] > k){
+                // 出窗口
+                cnt[nums[left++]]--;
+            }
+            // 更新结果
+            ans = std::max(ans, right - left + 1);
+            right++;
+        }
+        return ans;
+    }
+};
+// 借助滑动窗口 + 哈希表，维护一个满足要求的最长子数组
+// 一个元素进入窗口后，判断当前窗口维护的子数组是否满足要求
+// 1. 满足要求，更新长度
+// 2. 不满足要求，左边界出窗口，直到重新满足
+
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int n = height.size();
+        std::stack<int> stk;
+
+        int ans = 0;
+        for(int i=0; i<n; ++i){
+            while(!stk.empty() && height[stk.top()] < height[i]){
+                int cur = stk.top(); stk.pop();
+                if(stk.empty()) break; // 没有左墙
+                int left = stk.top();
+                int width = i - left - 1;
+                int h = std::min(height[left], height[i]) - height[cur];
+                ans += width * h;
+            }
+            stk.push(i);
+        }
+        return ans;
+    }
+};
