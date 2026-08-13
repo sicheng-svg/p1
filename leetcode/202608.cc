@@ -680,3 +680,55 @@ public:
         return ans;
     }
 };
+
+class Solution {
+    vector<int> pre, suf, best;
+    string str;
+
+    // 用两个子节点的信息，算出父节点的信息
+    void pull(int p, int l, int mid, int r) {
+        int lenL = mid - l + 1, lenR = r - mid;
+        pre[p]  = pre[2*p];
+        suf[p]  = suf[2*p+1];
+        best[p] = max(best[2*p], best[2*p+1]);
+
+        if (str[mid] == str[mid+1]) {                   // 边界字符相同才能拼
+            best[p] = max(best[p], suf[2*p] + pre[2*p+1]);   // 跨界段
+            if (pre[2*p] == lenL)   pre[p] = lenL + pre[2*p+1];
+            if (suf[2*p+1] == lenR) suf[p] = lenR + suf[2*p];
+        }
+    }
+
+    void build(int p, int l, int r) {
+        if (l == r) { pre[p] = suf[p] = best[p] = 1; return; }  // 单字符
+        int mid = (l + r) / 2;
+        build(2*p, l, mid);
+        build(2*p+1, mid+1, r);
+        pull(p, l, mid, r);
+    }
+
+    void update(int p, int l, int r, int idx) {
+        if (l == r) return;                    // 叶子的三个值恒为1
+        int mid = (l + r) / 2;
+        if (idx <= mid) update(2*p, l, mid, idx);
+        else            update(2*p+1, mid+1, r, idx);
+        pull(p, l, mid, r);                     // 回溯时重新合并
+    }
+
+public:
+    vector<int> longestRepeating(string s, string queryCharacters,
+                                  vector<int>& queryIndices) {
+        str = s;
+        int n = s.size(), k = queryCharacters.size();
+        pre.assign(4*n, 0); suf.assign(4*n, 0); best.assign(4*n, 0);
+        build(1, 0, n - 1);
+
+        vector<int> ans;
+        for (int i = 0; i < k; ++i) {
+            str[queryIndices[i]] = queryCharacters[i];   // 改字符
+            update(1, 0, n - 1, queryIndices[i]);        // 只更新一条路径
+            ans.push_back(best[1]);                       // 根节点就是答案
+        }
+        return ans;
+    }
+};
