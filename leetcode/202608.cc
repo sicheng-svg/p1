@@ -732,3 +732,52 @@ public:
         return ans;
     }
 };
+
+class StockSpanner {
+public:
+    StockSpanner() {}
+    
+    int next(int price) {
+        int span = 1;
+        while(!stk.empty() && price >= stk.top().first){// 栈不为空 && 今天价格大于等于昨天价格
+            span += stk.top().second;
+            stk.pop();
+        }
+        stk.emplace(price, span);
+        return span;
+    }
+private:
+    std::stack<std::pair<int, int>> stk;
+};
+// 如果今天的价格大于昨天的价格，那么昨天永远不会作为未来某一天的阻挡
+// 未来的某一天要么被今天阻挡，要么这两天都不会被阻挡
+
+/**
+ * Your StockSpanner object will be instantiated and called as such:
+ * StockSpanner* obj = new StockSpanner();
+ * int param_1 = obj->next(price);
+ */
+
+ class Solution {
+public:
+    int maximumLengthSubstring(string s) {
+        int n = s.size();
+        std::unordered_map<char, int> cnt;
+
+        int left = 0, right = 0;
+        int ans = 0;
+        while(right < n){
+            // 进窗口
+            cnt[s[right]]++;
+            // 判断
+            while(cnt[s[right]] > 2){
+                // 出窗口
+                cnt[s[left]]--;
+                left++;
+            }
+            ans = std::max(ans, right-left+1);
+            right++;
+        }
+        return ans;
+    }
+};
