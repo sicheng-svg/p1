@@ -781,3 +781,27 @@ public:
         return ans;
     }
 };
+
+class Solution {
+public:
+    int maxNumberOfFamilies(int n, vector<vector<int>>& reservedSeats) {
+        std::unordered_map<int, int> dict;
+        for(auto& r: reservedSeats){
+            int row = r[0], seat = r[1];
+            dict[row] |= (1 << (seat-1)); // 将列号转化为第几位二进制
+        }
+
+        const int A = 0b0000011110;
+        const int B = 0b0001111000;
+        const int C = 0b0111100000;
+        int ans = 0;
+        for(auto& [row, mask]: dict){
+            bool freeA = (mask & A) == 0;
+            bool freeB = (mask & B) == 0;
+            bool freeC = (mask & C) == 0;
+            if(freeA && freeC) ans += 2;
+            else if(freeA || freeB || freeC) ans++;
+        }
+        return ans + (n - dict.size())*2;
+    }
+};
