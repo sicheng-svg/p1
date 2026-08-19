@@ -805,3 +805,55 @@ public:
         return ans + (n - dict.size())*2;
     }
 };
+
+class Solution {
+public:
+    int maxSumMinProduct(vector<int>& nums) {
+        const int MOD = 1e9 + 7;
+        int n = nums.size();
+        std::vector<long long> prefix(n+1, 0);
+        for(int i=0; i<n; ++i) prefix[i+1] = prefix[i] + nums[i];
+
+        long long maxMinProduct = 0;
+        std::stack<int> stk;
+
+        for(int i=0; i<=n; ++i){
+            int cur = (i == n) ? 0 : nums[i];
+            while(!stk.empty() && nums[stk.top()] > cur){
+                int min = stk.top(); stk.pop();
+                int left = stk.empty() ? -1 : stk.top();
+                // (left, i)
+                long long sum = prefix[i] - prefix[left+1];
+                maxMinProduct = std::max(maxMinProduct, sum*nums[min]);
+            }
+            stk.push(i);
+        }
+        return maxMinProduct % MOD;
+    }
+};
+
+// 这道题与84题 柱状图中最大矩形面积类似
+// 我们可以枚举每一个位置，当作子数组的最小值，然后依次找到左右第一个比它小的值
+// 同时我们还需要需处理出一个前缀和数组，这样借助左右区间减法就可以得到目标区间的和
+
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int n = s.size();
+        int ans = 0;
+        int left = 0;
+        std::unordered_map<char, int> dict;
+        for(int right=0; right<n; ++right){
+            // 进窗口
+            dict[s[right]]++;
+            // 判断
+            while(dict[s[right]] > 1){
+                // 出窗口
+                dict[s[left++]]--;
+            }
+            // 更新结果
+            ans = std::max(ans, right-left+1);
+        }
+        return ans;
+    }
+};
