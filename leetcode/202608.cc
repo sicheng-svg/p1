@@ -857,3 +857,88 @@ public:
         return ans;
     }
 };
+
+class Solution {
+public:
+    vector<int> resultArray(vector<int>& nums) {
+        int n = nums.size();
+        std::vector<int> arr1;
+        std::vector<int> arr2;
+        arr1.push_back(nums[0]);
+        arr2.push_back(nums[1]);
+        for(int i=2; i<n; ++i){
+            if(arr1.back() > arr2.back()) arr1.push_back(nums[i]);
+            else arr2.push_back(nums[i]);
+        }
+        arr1.insert(arr1.end(), arr2.begin(), arr2.end());
+        return arr1;
+    }
+};
+
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        int m = s.size(), n = t.size();
+        std::unordered_map<char, int> needs; // 所需字符，包含重复字符个数
+        for(char c: t) needs[c]++;
+
+        int left = 0, get = 0;
+        int pos = 0, len = INT_MAX;
+        std::unordered_map<char, int> sub; // 记录当前出现的字符
+        for(int right=0; right<m; ++right){
+            // 进窗口
+            sub[s[right]]++;
+            // 字符出现个数和needs中出现个数一致，说明该字符满足要求
+            if(needs.count(s[right]) && sub[s[right]] == needs[s[right]]) get++; 
+            // 判断
+            while(get == needs.size()){
+                // 更新结果
+                if(len > right - left + 1) {
+                    len = right-left+1;
+                    pos = left;
+                }
+                // 出窗口
+                if(needs.count(s[left]) && sub[s[left]] == needs[s[left]]) get--;
+                sub[s[left]]--;
+                left++;
+            }   
+        }
+        std::cout << pos << " " << len << std::endl;
+        return len == INT_MAX ? "" : s.substr(pos, len);
+    }
+};
+
+class Solution {
+public:
+    vector<int> findAnagrams(string s, string p) {
+        int m = s.size();
+        std::unordered_map<char, int> needs;
+        for(char c: p) needs[c]++;
+
+        std::unordered_map<char, int> cnt;
+        std::vector<int> ans;
+        int left = 0, right = 0;
+        int get = 0;
+        while(right < m){
+            char c = s[right];
+            // 进窗口
+            if(needs.count(c)){
+                cnt[c]++;
+                if(cnt[c] == needs[c]) get++;
+            }
+            // 长度一样就需要判断，否则无法跳过非需要字符
+            if(right-left+1 == p.size()){
+                // 更新结果
+                if(get == needs.size()) ans.push_back(left);
+                // 出窗口
+                if(needs.count(s[left])){
+                    if(needs[s[left]] == cnt[s[left]]) get--;
+                }
+                cnt[s[left]]--;
+                left++;
+            }
+            right++;
+        }
+        return ans;
+    }
+};
