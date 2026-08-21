@@ -942,3 +942,110 @@ public:
         return ans;
     }
 };
+
+class Solution {
+public:
+    long long findKthSmallest(vector<int>& coins, int k) {
+        sort(coins.begin(), coins.end());
+        vector<long long> c;                      // 去掉被更小硬币整除的
+        for (int x : coins) {
+            bool redundant = false;
+            for (long long y : c) if (x % y == 0) { redundant = true; break; }
+            if (!redundant) c.push_back(x);
+        }
+        int n = c.size(), full = 1 << n;
+        vector<long long> L(full, 1);
+        vector<int> sgn(full, 0);
+        for (int s = 1; s < full; ++s) {          // 递推每个子集的 lcm
+            int i = __builtin_ctz(s), rest = s ^ (1 << i);
+            L[s] = L[rest] / __gcd(L[rest], c[i]) * c[i];
+            sgn[s] = (__builtin_popcount(s) & 1) ? 1 : -1;
+        }
+        auto count = [&](long long x) {
+            long long res = 0;
+            for (int s = 1; s < full; ++s) res += sgn[s] * (x / L[s]);
+            return res;
+        };
+        long long lo = 1, hi = (long long)k * c[0];
+        while (lo < hi) {
+            long long mid = lo + (hi - lo) / 2;
+            if (count(mid) >= k) hi = mid;
+            else lo = mid + 1;
+        }
+        return lo;
+    }
+};
+
+class Solution {
+public:
+    bool checkInclusion(string s1, string s2) {
+        int n = s2.size(), m = s1.size();
+        if(m > n) return false;
+        std::unordered_map<char, int> needs;
+        for(char c: s1) needs[c]++;
+
+        int left = 0, right = 0;
+        int get = 0;
+        std::unordered_map<char, int> window;
+        while(right < n){
+            // 进窗口
+            char cur = s2[right];
+            if(needs.count(cur)){
+                window[cur]++;
+                if(window[cur] == needs[cur]) get++;
+            }
+            // 判断
+            if(right-left+1 == m){
+                if(get == needs.size()) return true;
+                // 出窗口
+                char pop = s2[left];
+                if(needs.count(pop)){
+                    if(window[pop] == needs[pop]) get--;
+                    window[pop]--;
+                }
+                left++;
+            }
+            right++;
+        } 
+        return false;  
+    }
+};
+
+class Solution {
+public:
+    vector<int> _maxSlidingWindow(vector<int>& nums, int k) {
+        int n = nums.size();
+        if(k == 1) return nums;
+        if(k == n) return {*std::max_element(nums.begin(), nums.end())};
+
+        auto getMax = [&](int left, int right) ->int {
+            int x = nums[left];
+            for(int i=left+1; i<=right; ++i) x = std::max(x, nums[i]);
+            return x;
+        };
+
+        std::vector<int> ans;
+        int left = 0, right = k-1;
+        while(right < n){
+            ans.push_back(getMax(left, right));
+            left++;
+            right++;
+        }
+        return ans;
+    }
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        int n = nums.size();
+        if(k == 1) return nums;
+       
+        std::vector<int> ans;
+        ans.reserve(n - k + 1);
+        std::deque<int> dq;
+        for(int i=0; i<n; ++i){
+            while(!dq.empty() && nums[dq.back()] <= nums[i]) dq.pop_back();
+            dq.push_back(i);
+            if(dq.front() <= i-k) dq.pop_front();
+            if(i>=k-1) ans.push_back(nums[dq.front()]);
+        }
+        return ans;
+    }
+};
